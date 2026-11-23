@@ -1,0 +1,3358 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>銷單王者歸來 — 鎏金藝術網頁遊戲</title>
+
+  <!-- 優雅襯線與書法感字體 -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;900&family=Noto+Serif+TC:wght@500;700;900&display=swap" rel="stylesheet" />
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    :root {
+      --midnight: #121526;
+      --midnight-deep: #0b0d19;
+      --parchment: #F4ECD8;
+      --gold: #D9A74A;
+      --gold-bright: #FFE89E;
+      --cinnabar: #C83E37;
+      --emerald: #24594B;
+      --violet: #5B2A6B;
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background-color: var(--midnight-deep);
+      color: var(--parchment);
+      font-family: 'Noto Serif TC', Georgia, serif;
+    }
+
+    /* 背景微細紙張質感與皇家深藍漸層（不使用 base64 圖片） */
+    .art-bg {
+      background:
+        radial-gradient(circle at 50% 20%, rgba(217, 167, 74, 0.14), transparent 55%),
+        radial-gradient(circle at 15% 85%, rgba(91, 42, 107, 0.24), transparent 50%),
+        radial-gradient(circle at 85% 80%, rgba(36, 89, 75, 0.22), transparent 50%),
+        linear-gradient(160deg, #161a30 0%, #121526 55%, #0c0e1b 100%);
+      position: relative;
+    }
+
+    /* 柔和紙張紋理覆蓋層 */
+    .paper-grain {
+      pointer-events: none;
+      position: fixed;
+      inset: 0;
+      z-index: 40;
+      opacity: 0.06;
+      background-image:
+        repeating-radial-gradient(circle at 0 0, rgba(244, 236, 216, 0.5) 0, rgba(244, 236, 216, 0.5) 1px, transparent 1px, transparent 4px),
+        repeating-linear-gradient(45deg, rgba(217, 167, 74, 0.25) 0, rgba(217, 167, 74, 0.25) 1px, transparent 1px, transparent 7px);
+      mix-blend-mode: overlay;
+    }
+
+    /* 新藝術運動鎏金畫框 */
+    .nouveau-frame {
+      position: relative;
+      border: 1.5px solid rgba(217, 167, 74, 0.65);
+      box-shadow:
+        0 0 0 1px rgba(255, 232, 158, 0.18) inset,
+        0 18px 50px rgba(0, 0, 0, 0.65),
+        0 0 32px rgba(217, 167, 74, 0.16);
+      border-radius: 18px;
+      background: linear-gradient(180deg, rgba(18, 21, 38, 0.92), rgba(11, 13, 25, 0.96));
+    }
+
+    .corner-svg {
+      position: absolute;
+      width: 44px;
+      height: 44px;
+      pointer-events: none;
+      z-index: 25;
+      filter: drop-shadow(0 0 6px rgba(255, 232, 158, 0.45));
+    }
+    .corner-tl { top: -3px; left: -3px; }
+    .corner-tr { top: -3px; right: -3px; transform: scaleX(-1); }
+    .corner-bl { bottom: -3px; left: -3px; transform: scaleY(-1); }
+    .corner-br { bottom: -3px; right: -3px; transform: scale(-1, -1); }
+
+    /* 鎏金質感按鈕 */
+    .btn-gilded {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 0.75rem 1.5rem;
+      min-height: 48px;
+      border-radius: 9999px;
+      border: 1.5px solid var(--gold-bright);
+      background: linear-gradient(135deg, #b8832d 0%, #e6bc65 45%, #f9e4a3 55%, #b98229 100%);
+      color: #1c1406;
+      font-weight: 900;
+      letter-spacing: 0.08em;
+      box-shadow:
+        0 6px 20px rgba(217, 167, 74, 0.38),
+        0 2px 0 rgba(255, 255, 255, 0.5) inset,
+        0 -2px 4px rgba(102, 62, 10, 0.5) inset;
+      transition: transform 0.14s ease, box-shadow 0.2s ease, filter 0.2s ease;
+      cursor: pointer;
+      touch-action: manipulation;
+    }
+    .btn-gilded:hover {
+      filter: brightness(1.07);
+      box-shadow:
+        0 8px 26px rgba(255, 232, 158, 0.52),
+        0 2px 0 rgba(255, 255, 255, 0.65) inset;
+      transform: translateY(-1px);
+    }
+    .btn-gilded:active {
+      transform: translateY(1px) scale(0.97);
+    }
+    .btn-gilded:disabled {
+      opacity: 0.45;
+      filter: grayscale(0.5);
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    /* 硃砂紅印章按鈕 */
+    .btn-cinnabar {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.45rem;
+      padding: 0.72rem 1.35rem;
+      min-height: 48px;
+      border-radius: 9999px;
+      border: 1.5px solid #ffad9e;
+      background: linear-gradient(135deg, #8e231e 0%, #c83e37 50%, #e0564e 100%);
+      color: #fff8eb;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      box-shadow: 0 6px 20px rgba(200, 62, 55, 0.45), 0 1px 0 rgba(255, 255, 255, 0.35) inset;
+      transition: transform 0.14s ease, box-shadow 0.2s ease;
+      cursor: pointer;
+      touch-action: manipulation;
+    }
+    .btn-cinnabar:hover {
+      box-shadow: 0 8px 28px rgba(224, 86, 78, 0.65);
+      transform: translateY(-1px);
+    }
+    .btn-cinnabar:active {
+      transform: translateY(1px) scale(0.96);
+    }
+
+    /* 翡翠 / 紫羅蘭輔助按鈕 */
+    .btn-royal {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.45rem;
+      padding: 0.72rem 1.25rem;
+      min-height: 48px;
+      border-radius: 9999px;
+      border: 1.5px solid rgba(217, 167, 74, 0.75);
+      background: linear-gradient(135deg, rgba(36, 89, 75, 0.92), rgba(22, 56, 48, 0.96));
+      color: var(--parchment);
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      box-shadow: 0 5px 16px rgba(0, 0, 0, 0.42);
+      transition: transform 0.14s ease, border-color 0.2s ease;
+      cursor: pointer;
+      touch-action: manipulation;
+    }
+    .btn-royal:hover {
+      border-color: var(--gold-bright);
+      transform: translateY(-1px);
+    }
+    .btn-royal:active {
+      transform: translateY(1px) scale(0.97);
+    }
+
+    /* 狂喜終極一吼脈衝動畫 */
+    @keyframes roarPulse {
+      0%, 100% {
+        box-shadow: 0 0 18px rgba(255, 232, 158, 0.65), 0 0 40px rgba(200, 62, 55, 0.55);
+        transform: scale(1);
+      }
+      50% {
+        box-shadow: 0 0 34px rgba(255, 232, 158, 0.98), 0 0 65px rgba(200, 62, 55, 0.85);
+        transform: scale(1.045);
+      }
+    }
+    .animate-roar {
+      animation: roarPulse 0.9s infinite ease-in-out;
+    }
+
+    @keyframes floatSlow {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-6px); }
+    }
+    .animate-float {
+      animation: floatSlow 3.4s ease-in-out infinite;
+    }
+
+    @keyframes scrollUnfurl {
+      0% { opacity: 0; transform: scaleY(0.2) scaleX(0.92); }
+      100% { opacity: 1; transform: scaleY(1) scaleX(1); }
+    }
+    .scroll-unfurl {
+      animation: scrollUnfurl 0.55s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+
+    .gold-text {
+      background: linear-gradient(180deg, #fff6d6 0%, #f1ca73 48%, #c68d2e 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      filter: drop-shadow(0 2px 8px rgba(217, 167, 74, 0.4));
+    }
+
+    canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+      touch-action: none;
+    }
+
+    /* 自訂捲軸（針對小螢幕加冕卡） */
+    .custom-scroll::-webkit-scrollbar {
+      width: 6px;
+    }
+    .custom-scroll::-webkit-scrollbar-thumb {
+      background: rgba(217, 167, 74, 0.5);
+      border-radius: 999px;
+    }
+  </style>
+</head>
+<body class="art-bg flex flex-col items-center justify-between p-2 sm:p-4">
+  <!-- 微細紙張紋理 -->
+  <div class="paper-grain" aria-hidden="true"></div>
+
+  <!-- 頂部新藝術風格狀態列 -->
+  <header class="w-full max-w-5xl flex items-center justify-between gap-2 px-3 py-2 rounded-2xl border border-[#D9A74A]/45 bg-[#121526]/85 backdrop-blur-md shadow-lg z-30 shrink-0">
+    <div class="flex items-center gap-2.5 min-w-0">
+      <div class="w-9 h-9 rounded-full border border-[#FFE89E]/80 bg-gradient-to-br from-[#C83E37] to-[#7c1d18] flex items-center justify-center shadow-inner shrink-0">
+        <span class="text-[#FFE89E] font-black text-sm leading-none">銷</span>
+      </div>
+      <div class="min-w-0">
+        <div class="text-sm sm:text-base font-black tracking-widest gold-text truncate">銷單王者歸來</div>
+        <div id="hudStageLabel" class="text-[11px] sm:text-xs text-[#F4ECD8]/75 tracking-wider truncate">序幕・鎏金神劍傳說</div>
+      </div>
+    </div>
+
+    <!-- 中央即時進度指標（遊玩時顯示） -->
+    <div id="hudCenterStat" class="hidden md:flex items-center gap-3 px-4 py-1 rounded-full border border-[#D9A74A]/35 bg-[#0b0d19]/60 text-xs text-[#FFE89E] tracking-wider">
+      <span id="hudCenterText">準備啟程</span>
+    </div>
+
+    <!-- 右上角精緻音樂開關與重來 -->
+    <div class="flex items-center gap-2 shrink-0">
+      <button id="musicToggleBtn" type="button" class="flex items-center gap-1.5 px-3 py-2 rounded-full border border-[#D9A74A]/65 bg-[#1b2038]/90 hover:border-[#FFE89E] text-xs sm:text-sm text-[#FFE89E] font-bold transition shadow-md cursor-pointer" title="切換配樂與音效">
+        <svg id="iconSoundOn" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M11 5L6 9H2v6h4l5 4V5z"></path>
+          <path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+          <path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path>
+        </svg>
+        <svg id="iconSoundOff" class="w-4 h-4 hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M11 5L6 9H2v6h4l5 4V5z"></path>
+          <line x1="23" y1="9" x2="17" y2="15"></line>
+          <line x1="17" y1="9" x2="23" y2="15"></line>
+        </svg>
+        <span id="musicLabel" class="hidden sm:inline">配樂開啟</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- 中央主畫布區（含新藝術運動四角藤蔓花紋） -->
+  <main class="w-full max-w-5xl flex-1 min-h-0 my-2 sm:my-3 flex flex-col">
+    <div id="canvasWrapper" class="nouveau-frame w-full flex-1 min-h-0 overflow-hidden relative">
+      <!-- 四角新藝術風格 SVG 金色藤蔓花紋 -->
+      <svg class="corner-svg corner-tl" viewBox="0 0 60 60" fill="none" aria-hidden="true">
+        <path d="M4 56 V16 C4 9 9 4 16 4 H56" stroke="#D9A74A" stroke-width="2.2" />
+        <path d="M10 46 C10 26 20 12 44 10" stroke="#FFE89E" stroke-width="1.2" opacity="0.85" />
+        <circle cx="14" cy="14" r="4" fill="#D9A74A" />
+        <circle cx="14" cy="14" r="1.8" fill="#121526" />
+        <path d="M22 14 C28 14 31 19 28 24 C25 28 18 26 18 21" stroke="#FFE89E" stroke-width="1.3" fill="none" />
+      </svg>
+      <svg class="corner-svg corner-tr" viewBox="0 0 60 60" fill="none" aria-hidden="true">
+        <path d="M4 56 V16 C4 9 9 4 16 4 H56" stroke="#D9A74A" stroke-width="2.2" />
+        <path d="M10 46 C10 26 20 12 44 10" stroke="#FFE89E" stroke-width="1.2" opacity="0.85" />
+        <circle cx="14" cy="14" r="4" fill="#D9A74A" />
+        <circle cx="14" cy="14" r="1.8" fill="#121526" />
+        <path d="M22 14 C28 14 31 19 28 24 C25 28 18 26 18 21" stroke="#FFE89E" stroke-width="1.3" fill="none" />
+      </svg>
+      <svg class="corner-svg corner-bl" viewBox="0 0 60 60" fill="none" aria-hidden="true">
+        <path d="M4 56 V16 C4 9 9 4 16 4 H56" stroke="#D9A74A" stroke-width="2.2" />
+        <path d="M10 46 C10 26 20 12 44 10" stroke="#FFE89E" stroke-width="1.2" opacity="0.85" />
+        <circle cx="14" cy="14" r="4" fill="#D9A74A" />
+        <circle cx="14" cy="14" r="1.8" fill="#121526" />
+        <path d="M22 14 C28 14 31 19 28 24 C25 28 18 26 18 21" stroke="#FFE89E" stroke-width="1.3" fill="none" />
+      </svg>
+      <svg class="corner-svg corner-br" viewBox="0 0 60 60" fill="none" aria-hidden="true">
+        <path d="M4 56 V16 C4 9 9 4 16 4 H56" stroke="#D9A74A" stroke-width="2.2" />
+        <path d="M10 46 C10 26 20 12 44 10" stroke="#FFE89E" stroke-width="1.2" opacity="0.85" />
+        <circle cx="14" cy="14" r="4" fill="#D9A74A" />
+        <circle cx="14" cy="14" r="1.8" fill="#121526" />
+        <path d="M22 14 C28 14 31 19 28 24 C25 28 18 26 18 21" stroke="#FFE89E" stroke-width="1.3" fill="none" />
+      </svg>
+
+      <!-- 響應式主遊戲畫布 -->
+      <canvas id="gameCanvas"></canvas>
+
+      <!-- 序幕標題頁覆蓋層（半透明展示，背景為動態發光單據與神劍剪影） -->
+      <div id="titleOverlay" class="absolute inset-0 z-20 flex flex-col items-center justify-center p-4 text-center bg-gradient-to-b from-[#121526]/45 via-[#121526]/30 to-[#121526]/75 transition-opacity duration-500">
+        <div class="animate-float max-w-lg w-full px-6 py-7 rounded-3xl border border-[#D9A74A]/65 bg-[#121526]/75 backdrop-blur-md shadow-2xl relative">
+          <div class="inline-block px-3.5 py-1 mb-3 rounded-full border border-[#D9A74A]/60 bg-[#C83E37]/25 text-[#FFE89E] text-xs tracking-[0.25em]">
+            鎏金浮世繪本・三關史詩冒險
+          </div>
+          <h1 class="text-4xl sm:text-5xl font-black tracking-[0.14em] gold-text mb-2 leading-tight">
+            銷單王者歸來
+          </h1>
+          <p class="text-xs sm:text-sm text-[#F4ECD8]/85 tracking-widest mb-5 leading-relaxed">
+            萬單擊退恐龍刺蝟・蝸牛負紙闖山林<br class="hidden sm:inline" />
+            女王狂喜一吼清場・終拔金光銷單劍
+          </p>
+
+          <div class="grid grid-cols-3 gap-2 mb-6 text-[11px] sm:text-xs text-[#F4ECD8]/80">
+            <div class="p-2 rounded-xl border border-[#D9A74A]/30 bg-[#0b0d19]/55">
+              <div class="text-[#FFE89E] font-bold">第一關</div>
+              <div>萬單伐魔王</div>
+            </div>
+            <div class="p-2 rounded-xl border border-[#D9A74A]/30 bg-[#0b0d19]/55">
+              <div class="text-[#FFE89E] font-bold">第二關</div>
+              <div>蝸牛闖山林</div>
+            </div>
+            <div class="p-2 rounded-xl border border-[#D9A74A]/30 bg-[#0b0d19]/55">
+              <div class="text-[#FFE89E] font-bold">第三關</div>
+              <div>女王吼清場</div>
+            </div>
+          </div>
+
+          <button id="startGameBtn" type="button" class="btn-gilded text-base sm:text-lg px-9 py-3.5 w-full sm:w-auto">
+            <span>✦ 啟程銷單 ✦</span>
+          </button>
+          <p class="mt-3 text-[11px] text-[#F4ECD8]/55 tracking-wider">點擊啟程後將自動奏響原創鎏金配樂</p>
+        </div>
+      </div>
+
+      <!-- 章節捲軸過場覆蓋層 -->
+      <div id="scrollOverlay" class="hidden absolute inset-0 z-30 flex items-center justify-center p-4 bg-[#0b0d19]/78 backdrop-blur-sm">
+        <div id="scrollCard" class="scroll-unfurl max-w-md w-full rounded-2xl border-2 border-[#D9A74A] bg-gradient-to-b from-[#F4ECD8] via-[#efe3c4] to-[#e4d2a8] text-[#1c150c] p-6 sm:p-7 text-center shadow-[0_0_50px_rgba(217,167,74,0.45)] relative">
+          <div class="w-12 h-12 mx-auto mb-3 rounded-full bg-[#C83E37] text-[#F4ECD8] border-2 border-[#D9A74A] flex items-center justify-center font-black text-lg shadow-md" id="scrollSeal">壹</div>
+          <div id="scrollChapter" class="text-xs font-bold tracking-[0.3em] text-[#8e231e] mb-1">第一關</div>
+          <h2 id="scrollTitle" class="text-2xl sm:text-3xl font-black tracking-wider text-[#1a140c] mb-3">萬單齊發・恐龍刺蝟魔王</h2>
+          <div class="h-px w-28 mx-auto bg-gradient-to-r from-transparent via-[#C83E37] to-transparent mb-3"></div>
+          <p id="scrollDesc" class="text-sm leading-relaxed text-[#3a2d1b] mb-5">
+            不斷消費創造發光單據，如箭雨般射向恐龍刺蝟魔王！留意魔王捲縮成刺球反彈的瞬間，集滿狂潮釋放百單核爆！
+          </p>
+          <button id="scrollContinueBtn" type="button" class="btn-cinnabar px-8 py-2.5 text-sm">
+            展開卷軸・開始挑戰
+          </button>
+        </div>
+      </div>
+
+      <!-- 終章加冕慶典覆蓋層 -->
+      <div id="coronationOverlay" class="hidden absolute inset-0 z-30 flex items-center justify-center p-3 sm:p-5 bg-[#0b0d19]/82 backdrop-blur-md">
+        <div class="custom-scroll max-w-lg w-full max-h-full overflow-y-auto rounded-3xl border-2 border-[#FFE89E] bg-gradient-to-b from-[#1a1f38]/95 via-[#14172b]/98 to-[#0d101f]/98 p-5 sm:p-7 text-center shadow-[0_0_60px_rgba(255,232,158,0.35)]">
+          <div class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full border border-[#FFE89E]/70 bg-[#D9A74A]/20 text-[#FFE89E] text-xs tracking-[0.25em] mb-2">
+            ✦ 神劍出鞘・榮耀加冕 ✦
+          </div>
+          <h2 class="text-3xl sm:text-4xl font-black tracking-[0.14em] gold-text mb-1">銷單王歸來</h2>
+          <p class="text-xs sm:text-sm text-[#F4ECD8]/80 mb-4 tracking-wider">你已成功拔起萬丈金光的「銷單王」神劍，天下單據皆臣服於你！</p>
+
+          <!-- 本局趣味戰績 -->
+          <div class="grid grid-cols-3 gap-2.5 mb-5">
+            <div class="p-3 rounded-2xl border border-[#D9A74A]/45 bg-[#0b0d19]/70">
+              <div class="text-[11px] text-[#F4ECD8]/70 mb-1">創造單據總數</div>
+              <div id="statInvoices" class="text-xl sm:text-2xl font-black text-[#FFE89E]">0</div>
+              <div class="text-[10px] text-[#D9A74A]">張</div>
+            </div>
+            <div class="p-3 rounded-2xl border border-[#D9A74A]/45 bg-[#0b0d19]/70">
+              <div class="text-[11px] text-[#F4ECD8]/70 mb-1">蝸牛山林步數</div>
+              <div id="statSteps" class="text-xl sm:text-2xl font-black text-[#8CE0C3]">0</div>
+              <div class="text-[10px] text-[#D9A74A]">步</div>
+            </div>
+            <div class="p-3 rounded-2xl border border-[#D9A74A]/45 bg-[#0b0d19]/70">
+              <div class="text-[11px] text-[#F4ECD8]/70 mb-1">女王笑聲分貝</div>
+              <div id="statDecibels" class="text-xl sm:text-2xl font-black text-[#F5B0FF]">0</div>
+              <div class="text-[10px] text-[#D9A74A]">dB</div>
+            </div>
+          </div>
+
+          <!-- 紀念畫卡預覽縮圖提示 -->
+          <div class="mb-5 p-3 rounded-2xl border border-[#D9A74A]/35 bg-[#F4ECD8]/10 text-xs text-[#F4ECD8]/85 leading-relaxed">
+            已為你鑄造專屬高解析度<span class="text-[#FFE89E] font-bold">「鎏金銷單王紀念畫卡」</span>，完整收錄神劍聖光與三關傳奇數據。
+          </div>
+
+          <div class="flex flex-col sm:flex-row items-center justify-center gap-3">
+            <button id="downloadCardBtn" type="button" class="btn-gilded w-full sm:w-auto text-sm px-6">
+              <span>⬇ 下載鎏金銷單王紀念畫卡 (PNG)</span>
+            </button>
+            <button id="replayGameBtn" type="button" class="btn-royal w-full sm:w-auto text-sm px-6">
+              <span>↻ 再戰一次</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 訊息提示 Toast（取代 alert） -->
+      <div id="toastBox" class="pointer-events-none opacity-0 transition-opacity duration-300 absolute top-4 left-1/2 -translate-x-1/2 z-40 px-4 py-2 rounded-full border border-[#FFE89E]/80 bg-[#121526]/92 text-[#FFE89E] text-xs sm:text-sm font-bold shadow-xl tracking-wider whitespace-nowrap">
+        提示訊息
+      </div>
+    </div>
+  </main>
+
+  <!-- 底部操作控制列（置於畫布之外，確保手機與電腦操作清晰無遮擋） -->
+  <footer id="controlDeck" class="w-full max-w-5xl min-h-[64px] flex flex-wrap items-center justify-center gap-2.5 sm:gap-4 px-3 py-2 rounded-2xl border border-[#D9A74A]/40 bg-[#121526]/85 backdrop-blur-md shadow-lg z-30 shrink-0">
+    <!-- 序幕提示 -->
+    <div id="ctrlTitle" class="text-xs sm:text-sm text-[#F4ECD8]/75 tracking-widest text-center">
+      ✦ 支援滑鼠點擊、鍵盤空白鍵與手機觸控 ✦
+    </div>
+
+    <!-- 第一關控制鈕 -->
+    <div id="ctrlStage1" class="hidden w-full flex items-center justify-center gap-3 flex-wrap">
+      <button id="btnPrintInvoice" type="button" class="btn-gilded flex-1 sm:flex-none sm:min-w-[200px] text-sm sm:text-base">
+        <span>📜 消費印單攻擊</span>
+      </button>
+      <button id="btnHundredBurst" type="button" class="btn-cinnabar flex-1 sm:flex-none sm:min-w-[190px] text-sm sm:text-base opacity-50" disabled>
+        <span>🔥 百單核爆 (0%)</span>
+      </button>
+    </div>
+
+    <!-- 第二關控制鈕 -->
+    <div id="ctrlStage2" class="hidden w-full flex items-center justify-center gap-3 flex-wrap">
+      <button id="btnSnailJump" type="button" class="btn-gilded flex-1 sm:flex-none sm:min-w-[200px] text-sm sm:text-base">
+        <span>🐌 奮力小跳躍 (空白鍵)</span>
+      </button>
+      <button id="btnSnailSteady" type="button" class="btn-royal flex-1 sm:flex-none sm:min-w-[190px] text-sm sm:text-base">
+        <span>🍃 再拖一會・穩住單據</span>
+      </button>
+    </div>
+
+    <!-- 第三關控制鈕 -->
+    <div id="ctrlStage3" class="hidden w-full flex items-center justify-center gap-3 flex-wrap">
+      <button id="btnPileInvoice" type="button" class="btn-gilded flex-1 sm:flex-none sm:min-w-[230px] text-sm sm:text-base">
+        <span>📑 繼續累積單據 / 暫緩核銷</span>
+      </button>
+      <button id="btnQueenRoar" type="button" class="hidden btn-cinnabar animate-roar flex-1 sm:flex-none sm:min-w-[260px] text-sm sm:text-base border-[#FFE89E]">
+        <span>👑 女王終極一吼・清空所有單據！</span>
+      </button>
+    </div>
+
+    <!-- 終章拔劍控制鈕 -->
+    <div id="ctrlFinale" class="hidden w-full flex items-center justify-center gap-3 flex-wrap">
+      <button id="btnPullSword" type="button" class="btn-gilded w-full sm:w-auto sm:min-w-[300px] text-base sm:text-lg py-3">
+        <span>⚔️ 長按或連點・拔起「銷單王」神劍！</span>
+      </button>
+    </div>
+  </footer>
+
+  <script>
+    /**
+     * ============================================================================
+     * 《銷單王者歸來》單一檔案 HTML5 網頁遊戲引擎
+     * 風格：新藝術運動（Art Nouveau）× 鎏金浮世繪本
+     * 包含：Web Audio API 多樂章合成器、Canvas 2D 手繪藝術引擎、四階段完整玩法與 PNG 紀念畫卡生成器
+     * ============================================================================
+     */
+
+    (function () {
+      'use strict';
+
+      /* --------------------------------------------------------------------------
+       * 1. DOM 參照與工具函式
+       * -------------------------------------------------------------------------- */
+      const canvas = document.getElementById('gameCanvas');
+      const ctx = canvas.getContext('2d');
+      const canvasWrapper = document.getElementById('canvasWrapper');
+
+      const hudStageLabel = document.getElementById('hudStageLabel');
+      const hudCenterStat = document.getElementById('hudCenterStat');
+      const hudCenterText = document.getElementById('hudCenterText');
+
+      const titleOverlay = document.getElementById('titleOverlay');
+      const scrollOverlay = document.getElementById('scrollOverlay');
+      const scrollSeal = document.getElementById('scrollSeal');
+      const scrollChapter = document.getElementById('scrollChapter');
+      const scrollTitle = document.getElementById('scrollTitle');
+      const scrollDesc = document.getElementById('scrollDesc');
+      const scrollContinueBtn = document.getElementById('scrollContinueBtn');
+
+      const coronationOverlay = document.getElementById('coronationOverlay');
+      const statInvoicesEl = document.getElementById('statInvoices');
+      const statStepsEl = document.getElementById('statSteps');
+      const statDecibelsEl = document.getElementById('statDecibels');
+
+      const toastBox = document.getElementById('toastBox');
+
+      const ctrlTitle = document.getElementById('ctrlTitle');
+      const ctrlStage1 = document.getElementById('ctrlStage1');
+      const ctrlStage2 = document.getElementById('ctrlStage2');
+      const ctrlStage3 = document.getElementById('ctrlStage3');
+      const ctrlFinale = document.getElementById('ctrlFinale');
+
+      const btnPrintInvoice = document.getElementById('btnPrintInvoice');
+      const btnHundredBurst = document.getElementById('btnHundredBurst');
+      const btnSnailJump = document.getElementById('btnSnailJump');
+      const btnSnailSteady = document.getElementById('btnSnailSteady');
+      const btnPileInvoice = document.getElementById('btnPileInvoice');
+      const btnQueenRoar = document.getElementById('btnQueenRoar');
+      const btnPullSword = document.getElementById('btnPullSword');
+
+      const musicToggleBtn = document.getElementById('musicToggleBtn');
+      const iconSoundOn = document.getElementById('iconSoundOn');
+      const iconSoundOff = document.getElementById('iconSoundOff');
+      const musicLabel = document.getElementById('musicLabel');
+
+      let toastTimer = null;
+      function showToast(msg) {
+        toastBox.textContent = msg;
+        toastBox.style.opacity = '1';
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => {
+          toastBox.style.opacity = '0';
+        }, 2300);
+      }
+
+      function clamp(val, min, max) {
+        return Math.max(min, Math.min(max, val));
+      }
+
+      function lerp(a, b, t) {
+        return a + (b - a) * t;
+      }
+
+      function rand(min, max) {
+        return Math.random() * (max - min) + min;
+      }
+
+      /* --------------------------------------------------------------------------
+       * 2. Web Audio API 美麗多樂章配樂與音效合成器
+       * -------------------------------------------------------------------------- */
+      class RoyalAudioEngine {
+        constructor() {
+          this.ctx = null;
+          this.masterGain = null;
+          this.bgmGain = null;
+          this.sfxGain = null;
+          this.enabled = true;
+          this.initialized = false;
+          this.currentTrack = 'NONE';
+          this.stepIndex = 0;
+          this.schedulerId = null;
+        }
+
+        init() {
+          if (this.initialized) {
+            if (this.ctx && this.ctx.state === 'suspended') {
+              this.ctx.resume().catch(() => {});
+            }
+            return;
+          }
+          try {
+            const AudioCtx = window.AudioContext || window.webkitAudioContext;
+            this.ctx = new AudioCtx();
+            this.masterGain = this.ctx.createGain();
+            this.masterGain.gain.value = this.enabled ? 0.72 : 0;
+            this.masterGain.connect(this.ctx.destination);
+
+            this.bgmGain = this.ctx.createGain();
+            this.bgmGain.gain.value = 0.42;
+            this.bgmGain.connect(this.masterGain);
+
+            this.sfxGain = this.ctx.createGain();
+            this.sfxGain.gain.value = 0.75;
+            this.sfxGain.connect(this.masterGain);
+
+            this.initialized = true;
+          } catch (e) {
+            console.warn('Web Audio API 無法啟動:', e);
+          }
+        }
+
+        toggle() {
+          this.init();
+          this.enabled = !this.enabled;
+          if (this.masterGain && this.ctx) {
+            const now = this.ctx.currentTime;
+            this.masterGain.gain.cancelScheduledValues(now);
+            this.masterGain.gain.setTargetAtTime(this.enabled ? 0.72 : 0, now, 0.08);
+          }
+          iconSoundOn.classList.toggle('hidden', !this.enabled);
+          iconSoundOff.classList.toggle('hidden', this.enabled);
+          musicLabel.textContent = this.enabled ? '配樂開啟' : '配樂靜音';
+          showToast(this.enabled ? '♪ 鎏金配樂已開啟' : '♪ 配樂已靜音');
+        }
+
+        /* 基礎樂器發音：豎琴 / 鋼片琴 / 巴洛克弦樂 / 長笛 / 大鍵琴 / 暖弦 Pad */
+        playTone(freq, {
+          type = 'sine',
+          duration = 0.5,
+          volume = 0.2,
+          attack = 0.015,
+          delay = 0,
+          detune = 0,
+          filterFreq = 3200,
+          target = 'bgm'
+        } = {}) {
+          if (!this.initialized || !this.ctx || !this.enabled) return;
+          try {
+            const now = this.ctx.currentTime + delay;
+            const osc = this.ctx.createOscillator();
+            const gain = this.ctx.createGain();
+            const filter = this.ctx.createBiquadFilter();
+
+            osc.type = type;
+            osc.frequency.setValueAtTime(freq, now);
+            if (detune) osc.detune.setValueAtTime(detune, now);
+
+            filter.type = 'lowpass';
+            filter.frequency.setValueAtTime(filterFreq, now);
+
+            gain.gain.setValueAtTime(0.0001, now);
+            gain.gain.linearRampToValueAtTime(volume, now + attack);
+            gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
+
+            osc.connect(filter);
+            filter.connect(gain);
+            gain.connect(target === 'sfx' ? this.sfxGain : this.bgmGain);
+
+            osc.start(now);
+            osc.stop(now + duration + 0.04);
+          } catch (e) {}
+        }
+
+        /* 溫暖弦樂和弦 Pad */
+        playPadChord(freqs, duration = 2.4, volume = 0.075) {
+          freqs.forEach((f, idx) => {
+            this.playTone(f, {
+              type: 'triangle',
+              duration,
+              volume,
+              attack: 0.45,
+              detune: (idx - 1) * 5,
+              filterFreq: 1200,
+              target: 'bgm'
+            });
+          });
+        }
+
+        /* 鼓點合成 */
+        playDrum(pitch = 110, duration = 0.16, volume = 0.28, target = 'bgm') {
+          if (!this.initialized || !this.ctx || !this.enabled) return;
+          try {
+            const now = this.ctx.currentTime;
+            const osc = this.ctx.createOscillator();
+            const gain = this.ctx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(pitch, now);
+            osc.frequency.exponentialRampToValueAtTime(36, now + duration);
+
+            gain.gain.setValueAtTime(volume, now);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + duration);
+
+            osc.connect(gain);
+            gain.connect(target === 'sfx' ? this.sfxGain : this.bgmGain);
+            osc.start(now);
+            osc.stop(now + duration + 0.02);
+          } catch (e) {}
+        }
+
+        /* 白噪音刷紙聲 / 衝擊聲 */
+        playNoise(duration = 0.12, volume = 0.18, filterFreq = 2600, filterType = 'bandpass') {
+          if (!this.initialized || !this.ctx || !this.enabled) return;
+          try {
+            const bufferSize = Math.floor(this.ctx.sampleRate * duration);
+            const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+            const data = buffer.getChannelData(0);
+            for (let i = 0; i < bufferSize; i++) {
+              data[i] = (Math.random() * 2 - 1) * Math.exp(-i / (bufferSize * 0.45));
+            }
+            const noise = this.ctx.createBufferSource();
+            noise.buffer = buffer;
+            const filter = this.ctx.createBiquadFilter();
+            filter.type = filterType;
+            filter.frequency.value = filterFreq;
+            const gain = this.ctx.createGain();
+            gain.gain.value = volume;
+
+            noise.connect(filter);
+            filter.connect(gain);
+            gain.connect(this.sfxGain);
+            noise.start();
+          } catch (e) {}
+        }
+
+        /* 切換場景專屬原創旋律 */
+        setTrack(trackName) {
+          if (this.currentTrack === trackName) return;
+          this.currentTrack = trackName;
+          this.stepIndex = 0;
+          if (this.schedulerId) {
+            clearInterval(this.schedulerId);
+            this.schedulerId = null;
+          }
+          if (!this.initialized) return;
+
+          // 音高對照 (Hz)
+          const N = {
+            D3: 146.83, E3: 164.81, Fs3: 185.00, G3: 196.00, A3: 220.00, B3: 246.94,
+            C4: 261.63, Cs4: 277.18, D4: 293.66, Ds4: 311.13, E4: 329.63, F4: 349.23,
+            Fs4: 369.99, G4: 392.00, Gs4: 415.30, A4: 440.00, Bb4: 466.16, B4: 493.88,
+            C5: 523.25, Cs5: 554.37, D5: 587.33, E5: 659.25, F5: 698.46, Fs5: 739.99,
+            G5: 783.99, A5: 880.00, B5: 987.77, D6: 1174.66
+          };
+
+          if (trackName === 'TITLE') {
+            // 1. 標題頁：空靈優雅的豎琴與鋼片琴 D 大調序曲
+            const arp = [N.D4, N.Fs4, N.A4, N.D5, N.E5, N.Fs5, N.A4, N.D5, N.B3, N.D4, N.Fs4, N.B4, N.A3, N.E4, N.A4, N.Cs5];
+            const chords = [
+              [N.D3, N.A3, N.Fs4],
+              [N.B3, N.D4, N.Fs4],
+              [N.G3, N.B3, N.D4],
+              [N.A3, N.Cs4, N.E4]
+            ];
+            this.schedulerId = setInterval(() => {
+              const s = this.stepIndex++;
+              const note = arp[s % arp.length];
+              this.playTone(note, { type: 'triangle', duration: 1.1, volume: 0.14, attack: 0.01, filterFreq: 2800 });
+              if (s % 4 === 0) {
+                this.playTone(note * 2, { type: 'sine', duration: 1.5, volume: 0.075, attack: 0.008, filterFreq: 4500 });
+              }
+              if (s % 8 === 0) {
+                this.playPadChord(chords[Math.floor(s / 8) % chords.length], 2.8, 0.06);
+              }
+            }, 340);
+          } else if (trackName === 'STAGE1') {
+            // 2. 第一關：緊湊華麗的巴洛克弦樂撥奏與戰鼓節奏 (D 小調)
+            const melody = [N.D4, N.F4, N.A4, N.D5, N.C5, N.Bb4, N.A4, N.G4, N.F4, N.A4, N.G4, N.E4, N.D4, N.E4, N.F4, N.A4];
+            const bass = [N.D3, N.D3, N.A3, N.D3, N.G3, N.G3, N.A3, N.A3];
+            this.schedulerId = setInterval(() => {
+              const s = this.stepIndex++;
+              // 撥奏主旋律
+              this.playTone(melody[s % melody.length], { type: 'sawtooth', duration: 0.18, volume: 0.11, attack: 0.008, filterFreq: 1900 });
+              // 低音行進
+              if (s % 2 === 0) {
+                this.playTone(bass[Math.floor(s / 2) % bass.length], { type: 'triangle', duration: 0.22, volume: 0.16, attack: 0.01, filterFreq: 900 });
+                this.playDrum(s % 4 === 0 ? 125 : 95, 0.14, s % 4 === 0 ? 0.28 : 0.16);
+              }
+              if (s % 4 === 2) {
+                this.playNoise(0.06, 0.07, 3600, 'highpass');
+              }
+            }, 185);
+          } else if (trackName === 'STAGE2') {
+            // 3. 第二關：治癒唯美的 3/4 拍山林長笛與豎琴圓舞曲 (G 大調五聲色彩)
+            const waltzHarp = [N.G3, N.D4, N.B4, N.E3, N.B3, N.G4, N.C4, N.G4, N.E5, N.D4, N.A4, N.Fs4];
+            const flute = [N.B4, 0, N.D5, N.E5, 0, N.D5, N.B4, N.A4, N.G4, N.A4, 0, 0, N.G5, 0, N.E5, N.D5, 0, N.B4];
+            this.schedulerId = setInterval(() => {
+              const s = this.stepIndex++;
+              const beat = s % 3;
+              this.playTone(waltzHarp[s % waltzHarp.length], {
+                type: 'triangle',
+                duration: beat === 0 ? 0.9 : 0.55,
+                volume: beat === 0 ? 0.14 : 0.09,
+                attack: 0.015,
+                filterFreq: 2400
+              });
+              const fNote = flute[s % flute.length];
+              if (fNote) {
+                this.playTone(fNote, { type: 'sine', duration: 0.78, volume: 0.12, attack: 0.09, filterFreq: 2200 });
+              }
+              if (s % 6 === 0) {
+                this.playPadChord([N.G3, N.B3, N.D4], 2.1, 0.05);
+              }
+            }, 310);
+          } else if (trackName === 'STAGE3') {
+            // 4. 第三關：華麗宮廷大鍵琴與漸強華爾滋（隨女王狂喜值愈發歡快）
+            const harpsichord = [N.A4, N.C5, N.E5, N.A5, N.G5, N.E5, N.F5, N.D5, N.B4, N.E5, N.Gs4, N.B4];
+            const bass = [N.A3, N.E4, N.E4, N.D4, N.F4, N.F4, N.E3, N.B3, N.E4];
+            this.schedulerId = setInterval(() => {
+              const s = this.stepIndex++;
+              const joyBoost = state.stage3 ? state.stage3.joy / 100 : 0;
+              this.playTone(harpsichord[s % harpsichord.length], {
+                type: 'sawtooth',
+                duration: 0.26,
+                volume: 0.09 + joyBoost * 0.05,
+                attack: 0.005,
+                filterFreq: 2400 + joyBoost * 1800
+              });
+              this.playTone(bass[s % bass.length], {
+                type: 'triangle',
+                duration: 0.35,
+                volume: 0.12,
+                attack: 0.01,
+                filterFreq: 1300
+              });
+              if (joyBoost > 0.45 && s % 3 === 0) {
+                // 歡快上揚的鋼片琴點綴
+                this.playTone(harpsichord[(s + 2) % harpsichord.length] * 1.5, {
+                  type: 'sine',
+                  duration: 0.32,
+                  volume: 0.075,
+                  attack: 0.008
+                });
+              }
+            }, 250);
+          } else if (trackName === 'FINALE') {
+            // 5. 終章：神聖輝煌的金色和聲與豎琴滑音高潮
+            const sacredArp = [N.D4, N.A4, N.D5, N.Fs5, N.A5, N.D6, N.A5, N.Fs5];
+            const epicChords = [
+              [N.D3, N.A3, N.D4, N.Fs4],
+              [N.G3, N.B3, N.D4, N.G4],
+              [N.A3, N.Cs4, N.E4, N.A4],
+              [N.D3, N.A3, N.Fs4, N.D5]
+            ];
+            this.schedulerId = setInterval(() => {
+              const s = this.stepIndex++;
+              this.playTone(sacredArp[s % sacredArp.length], {
+                type: 'triangle',
+                duration: 1.25,
+                volume: 0.14,
+                attack: 0.012,
+                filterFreq: 3800
+              });
+              if (s % 8 === 0) {
+                this.playPadChord(epicChords[Math.floor(s / 8) % epicChords.length], 2.6, 0.09);
+                this.playDrum(90, 0.25, 0.22);
+              }
+            }, 260);
+          }
+        }
+
+        /* 各類生動遊戲音效 */
+        sfxPaperShoot() {
+          this.playNoise(0.08, 0.22, 2400, 'bandpass');
+          this.playTone(580 + Math.random() * 180, { type: 'triangle', duration: 0.09, volume: 0.14, attack: 0.005, target: 'sfx' });
+        }
+
+        sfxBossHit() {
+          this.playDrum(150, 0.12, 0.32, 'sfx');
+          this.playTone(220 + Math.random() * 60, { type: 'sawtooth', duration: 0.1, volume: 0.12, attack: 0.005, filterFreq: 1100, target: 'sfx' });
+        }
+
+        sfxReflect() {
+          this.playTone(980, { type: 'square', duration: 0.14, volume: 0.11, attack: 0.003, filterFreq: 2600, target: 'sfx' });
+          this.playTone(620, { type: 'triangle', duration: 0.16, volume: 0.12, delay: 0.05, target: 'sfx' });
+        }
+
+        sfxComboBurst() {
+          [523.25, 659.25, 783.99, 1046.5, 1318.5].forEach((f, i) => {
+            this.playTone(f, { type: 'triangle', duration: 0.45, volume: 0.2, delay: i * 0.045, target: 'sfx' });
+          });
+          this.playDrum(130, 0.3, 0.42, 'sfx');
+        }
+
+        sfxSnailJump() {
+          if (!this.initialized || !this.ctx || !this.enabled) return;
+          try {
+            const now = this.ctx.currentTime;
+            const osc = this.ctx.createOscillator();
+            const gain = this.ctx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(280, now);
+            osc.frequency.exponentialRampToValueAtTime(560, now + 0.16);
+            gain.gain.setValueAtTime(0.22, now);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.2);
+            osc.connect(gain);
+            gain.connect(this.sfxGain);
+            osc.start(now);
+            osc.stop(now + 0.22);
+          } catch (e) {}
+        }
+
+        sfxDewCollect() {
+          this.playTone(880, { type: 'sine', duration: 0.25, volume: 0.18, target: 'sfx' });
+          this.playTone(1318.5, { type: 'sine', duration: 0.35, volume: 0.16, delay: 0.07, target: 'sfx' });
+        }
+
+        sfxSnailBonk() {
+          this.playDrum(115, 0.18, 0.3, 'sfx');
+          this.playTone(190, { type: 'triangle', duration: 0.18, volume: 0.15, target: 'sfx' });
+        }
+
+        sfxInvoiceStack() {
+          this.playNoise(0.07, 0.16, 1800, 'bandpass');
+          this.playTone(440 + Math.random() * 240, { type: 'triangle', duration: 0.14, volume: 0.13, target: 'sfx' });
+        }
+
+        /* 女王「哈哈哈哈」歡快節奏笑聲合成 */
+        sfxQueenLaugh(joyRatio = 0.5) {
+          const base = 420 + joyRatio * 260;
+          const vol = 0.13 + joyRatio * 0.13;
+          const count = joyRatio > 0.7 ? 4 : 3;
+          for (let i = 0; i < count; i++) {
+            const f = base + (i % 2 === 0 ? 90 : 0) + i * 32;
+            this.playTone(f, {
+              type: 'triangle',
+              duration: 0.14,
+              volume: vol,
+              attack: 0.01,
+              delay: i * 0.11,
+              filterFreq: 2800,
+              target: 'sfx'
+            });
+            this.playTone(f * 1.5, {
+              type: 'sine',
+              duration: 0.12,
+              volume: vol * 0.55,
+              attack: 0.01,
+              delay: i * 0.11,
+              target: 'sfx'
+            });
+          }
+        }
+
+        /* 女王終極獅吼音波 + 萬單清空風鈴 */
+        sfxQueenRoar() {
+          if (!this.initialized || !this.ctx || !this.enabled) return;
+          try {
+            const now = this.ctx.currentTime;
+            // 低頻震撼獅吼
+            const osc = this.ctx.createOscillator();
+            const gain = this.ctx.createGain();
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(175, now);
+            osc.frequency.exponentialRampToValueAtTime(62, now + 1.15);
+            const filter = this.ctx.createBiquadFilter();
+            filter.type = 'lowpass';
+            filter.frequency.setValueAtTime(1100, now);
+            filter.frequency.exponentialRampToValueAtTime(280, now + 1.15);
+
+            gain.gain.setValueAtTime(0.01, now);
+            gain.gain.linearRampToValueAtTime(0.42, now + 0.08);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 1.25);
+
+            osc.connect(filter);
+            filter.connect(gain);
+            gain.connect(this.sfxGain);
+            osc.start(now);
+            osc.stop(now + 1.3);
+
+            // 氣流衝擊噪音
+            this.playNoise(0.95, 0.34, 950, 'bandpass');
+
+            // 接著是璀璨萬單清空風鈴聲
+            const chimes = [1046.5, 1174.66, 1318.5, 1567.98, 1760, 2093, 2349.3, 2637];
+            chimes.forEach((f, idx) => {
+              this.playTone(f, {
+                type: 'sine',
+                duration: 0.9,
+                volume: 0.14,
+                delay: 0.45 + idx * 0.075,
+                filterFreq: 5000,
+                target: 'sfx'
+              });
+            });
+          } catch (e) {}
+        }
+
+        sfxSwordPullTick(progress) {
+          const pitch = 320 + progress * 680;
+          this.playTone(pitch, { type: 'triangle', duration: 0.15, volume: 0.14, target: 'sfx' });
+        }
+
+        sfxSwordUnsheathe() {
+          // 寶劍出鞘清越金鳴 + 豎琴大滑音
+          this.playTone(1480, { type: 'sine', duration: 1.8, volume: 0.24, attack: 0.01, target: 'sfx' });
+          this.playTone(2217.46, { type: 'triangle', duration: 1.5, volume: 0.16, attack: 0.02, target: 'sfx' });
+          const gliss = [293.66, 369.99, 440, 587.33, 739.99, 880, 1174.66, 1479.98, 1760, 2349.32];
+          gliss.forEach((f, i) => {
+            this.playTone(f, { type: 'triangle', duration: 1.1, volume: 0.16, delay: i * 0.055, target: 'sfx' });
+          });
+        }
+      }
+
+      const audio = new RoyalAudioEngine();
+
+      /* --------------------------------------------------------------------------
+       * 3. 畫布響應式尺寸與全域遊戲狀態
+       * -------------------------------------------------------------------------- */
+      let W = 800;
+      let H = 500;
+      let dpr = Math.min(window.devicePixelRatio || 1, 2);
+
+      function resizeCanvas() {
+        const rect = canvasWrapper.getBoundingClientRect();
+        W = Math.max(300, Math.floor(rect.width));
+        H = Math.max(260, Math.floor(rect.height));
+        dpr = Math.min(window.devicePixelRatio || 1, 2);
+        canvas.width = Math.floor(W * dpr);
+        canvas.height = Math.floor(H * dpr);
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      }
+
+      const state = {
+        phase: 'TITLE', // TITLE, STAGE1, STAGE2, STAGE3, FINALE, CORONATION
+        pausedForScroll: false,
+        time: 0,
+        shake: 0,
+        flashAlpha: 0,
+        particles: [],
+        floatingTexts: [],
+        stats: {
+          totalInvoices: 0,
+          snailSteps: 0,
+          queenDecibels: 65.0
+        },
+        // 標題背景漂浮單據
+        titleInvoices: [],
+        // 各關獨立狀態
+        stage1: null,
+        stage2: null,
+        stage3: null,
+        finale: null
+      };
+
+      /* --------------------------------------------------------------------------
+       * 4. 粒子與書法飄字系統
+       * -------------------------------------------------------------------------- */
+      function spawnParticles(x, y, count, options = {}) {
+        const {
+          colors = ['#FFE89E', '#D9A74A', '#F4ECD8'],
+          speedMin = 40,
+          speedMax = 180,
+          sizeMin = 2,
+          sizeMax = 6,
+          lifeMin = 0.5,
+          lifeMax = 1.2,
+          gravity = 120,
+          shape = 'circle' // circle | star | paper
+        } = options;
+
+        for (let i = 0; i < count; i++) {
+          const angle = Math.random() * Math.PI * 2;
+          const speed = rand(speedMin, speedMax);
+          state.particles.push({
+            x,
+            y,
+            vx: Math.cos(angle) * speed,
+            vy: Math.sin(angle) * speed - rand(10, 60),
+            size: rand(sizeMin, sizeMax),
+            color: colors[Math.floor(Math.random() * colors.length)],
+            life: rand(lifeMin, lifeMax),
+            maxLife: lifeMax,
+            gravity,
+            shape,
+            rot: rand(0, Math.PI * 2),
+            vrot: rand(-6, 6)
+          });
+        }
+      }
+
+      function spawnFloatingText(x, y, text, options = {}) {
+        state.floatingTexts.push({
+          x,
+          y,
+          text,
+          color: options.color || '#FFE89E',
+          stroke: options.stroke || '#121526',
+          size: options.size || 20,
+          life: options.life || 1.15,
+          maxLife: options.life || 1.15,
+          vy: options.vy !== undefined ? options.vy : -55,
+          scalePop: options.scalePop || false
+        });
+      }
+
+      function updateParticlesAndTexts(dt) {
+        for (let i = state.particles.length - 1; i >= 0; i--) {
+          const p = state.particles[i];
+          p.life -= dt;
+          if (p.life <= 0) {
+            state.particles.splice(i, 1);
+            continue;
+          }
+          p.vy += p.gravity * dt;
+          p.x += p.vx * dt;
+          p.y += p.vy * dt;
+          p.rot += p.vrot * dt;
+        }
+
+        for (let i = state.floatingTexts.length - 1; i >= 0; i--) {
+          const ft = state.floatingTexts[i];
+          ft.life -= dt;
+          if (ft.life <= 0) {
+            state.floatingTexts.splice(i, 1);
+            continue;
+          }
+          ft.y += ft.vy * dt;
+        }
+      }
+
+      function drawParticlesAndTexts() {
+        for (const p of state.particles) {
+          const alpha = clamp(p.life / p.maxLife, 0, 1);
+          ctx.save();
+          ctx.globalAlpha = alpha;
+          ctx.translate(p.x, p.y);
+          ctx.rotate(p.rot);
+          ctx.fillStyle = p.color;
+          if (p.shape === 'paper') {
+            ctx.fillRect(-p.size, -p.size * 0.65, p.size * 2, p.size * 1.3);
+            ctx.strokeStyle = '#D9A74A';
+            ctx.lineWidth = 1;
+            ctx.strokeRect(-p.size, -p.size * 0.65, p.size * 2, p.size * 1.3);
+          } else if (p.shape === 'star') {
+            ctx.beginPath();
+            for (let k = 0; k < 4; k++) {
+              const a = (k * Math.PI) / 2;
+              ctx.lineTo(Math.cos(a) * p.size * 1.6, Math.sin(a) * p.size * 1.6);
+              ctx.lineTo(Math.cos(a + Math.PI / 4) * p.size * 0.45, Math.sin(a + Math.PI / 4) * p.size * 0.45);
+            }
+            ctx.closePath();
+            ctx.fill();
+          } else {
+            ctx.beginPath();
+            ctx.arc(0, 0, p.size, 0, Math.PI * 2);
+            ctx.fill();
+          }
+          ctx.restore();
+        }
+
+        for (const ft of state.floatingTexts) {
+          const ratio = clamp(ft.life / ft.maxLife, 0, 1);
+          const scale = ft.scalePop ? (1 + Math.sin((1 - ratio) * Math.PI) * 0.22) : 1;
+          ctx.save();
+          ctx.globalAlpha = Math.min(1, ratio * 1.6);
+          ctx.translate(ft.x, ft.y);
+          ctx.scale(scale, scale);
+          ctx.font = `900 ${ft.size}px "Noto Serif TC", Georgia, serif`;
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.lineWidth = 4;
+          ctx.strokeStyle = ft.stroke;
+          ctx.strokeText(ft.text, 0, 0);
+          ctx.fillStyle = ft.color;
+          ctx.fillText(ft.text, 0, 0);
+          ctx.restore();
+        }
+      }
+
+      /* --------------------------------------------------------------------------
+       * 5. 藝術手繪向量元件（發光金邊單據、新藝術拱門、角色與魔王）
+       * -------------------------------------------------------------------------- */
+      const INVOICE_LABELS = ['發票', '報銷單', '收據', '簽呈', '請款單'];
+
+      function drawInvoicePaper(x, y, w, h, rot, label = '發票', golden = false) {
+        ctx.save();
+        ctx.translate(x, y);
+        ctx.rotate(rot);
+
+        // 柔和金光
+        ctx.shadowColor = golden ? 'rgba(255, 232, 158, 0.95)' : 'rgba(217, 167, 74, 0.55)';
+        ctx.shadowBlur = golden ? 18 : 8;
+
+        // 羊皮紙主體
+        ctx.fillStyle = golden ? '#FFF3C4' : '#F4ECD8';
+        ctx.strokeStyle = golden ? '#FFE89E' : '#D9A74A';
+        ctx.lineWidth = golden ? 2.4 : 1.6;
+        ctx.beginPath();
+        ctx.roundRect(-w / 2, -h / 2, w, h, 4);
+        ctx.fill();
+        ctx.stroke();
+        ctx.shadowBlur = 0;
+
+        // 單據明細橫線
+        ctx.strokeStyle = 'rgba(130, 96, 48, 0.45)';
+        ctx.lineWidth = 1;
+        for (let i = -1; i <= 1; i++) {
+          ctx.beginPath();
+          ctx.moveTo(-w * 0.34, i * (h * 0.16) + h * 0.06);
+          ctx.lineTo(w * 0.34, i * (h * 0.16) + h * 0.06);
+          ctx.stroke();
+        }
+
+        // 硃砂印章
+        ctx.fillStyle = '#C83E37';
+        ctx.beginPath();
+        ctx.arc(w * 0.24, h * 0.24, Math.min(w, h) * 0.14, 0, Math.PI * 2);
+        ctx.fill();
+
+        // 單據小字
+        if (w >= 28) {
+          ctx.fillStyle = '#5c3b14';
+          ctx.font = `700 ${Math.max(8, Math.floor(w * 0.24))}px "Noto Serif TC", serif`;
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.fillText(label, 0, -h * 0.22);
+        }
+        ctx.restore();
+      }
+
+      /* 繪製新藝術運動金色光環背板 */
+      function drawArtNouveauHalo(cx, cy, radius, alpha = 0.22) {
+        ctx.save();
+        ctx.translate(cx, cy);
+        ctx.globalAlpha = alpha;
+        ctx.strokeStyle = '#D9A74A';
+        ctx.lineWidth = 1.6;
+
+        ctx.beginPath();
+        ctx.arc(0, 0, radius, 0, Math.PI * 2);
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.arc(0, 0, radius * 0.86, 0, Math.PI * 2);
+        ctx.stroke();
+
+        // 放射狀鎏金細線
+        const rays = 24;
+        for (let i = 0; i < rays; i++) {
+          const a = (i / rays) * Math.PI * 2 + state.time * 0.08;
+          ctx.beginPath();
+          ctx.moveTo(Math.cos(a) * radius * 0.86, Math.sin(a) * radius * 0.86);
+          ctx.lineTo(Math.cos(a) * radius, Math.sin(a) * radius);
+          ctx.stroke();
+        }
+        ctx.restore();
+      }
+
+      /* --------------------------------------------------------------------------
+       * 6. 標題頁背景動畫
+       * -------------------------------------------------------------------------- */
+      function initTitleScene() {
+        state.titleInvoices = [];
+        for (let i = 0; i < 18; i++) {
+          state.titleInvoices.push({
+            x: rand(0, W),
+            y: rand(0, H),
+            vy: rand(-26, -12),
+            vx: rand(-10, 10),
+            rot: rand(-0.4, 0.4),
+            vrot: rand(-0.6, 0.6),
+            scale: rand(0.65, 1.15),
+            label: INVOICE_LABELS[i % INVOICE_LABELS.length]
+          });
+        }
+      }
+
+      function updateAndDrawTitle(dt) {
+        // 深邃皇家午夜藍漸層背景
+        const bg = ctx.createRadialGradient(W * 0.5, H * 0.42, 20, W * 0.5, H * 0.5, Math.max(W, H) * 0.75);
+        bg.addColorStop(0, '#272448');
+        bg.addColorStop(0.55, '#121526');
+        bg.addColorStop(1, '#090b15');
+        ctx.fillStyle = bg;
+        ctx.fillRect(0, 0, W, H);
+
+        drawArtNouveauHalo(W * 0.5, H * 0.48, Math.min(W, H) * 0.38, 0.25);
+
+        // 背景神劍金色剪影
+        ctx.save();
+        ctx.translate(W * 0.5, H * 0.5);
+        const pulse = 0.65 + Math.sin(state.time * 2.2) * 0.2;
+        ctx.globalAlpha = 0.35 * pulse;
+        const swordGrad = ctx.createLinearGradient(0, -H * 0.35, 0, H * 0.35);
+        swordGrad.addColorStop(0, '#FFE89E');
+        swordGrad.addColorStop(0.5, '#D9A74A');
+        swordGrad.addColorStop(1, 'rgba(217,167,74,0)');
+        ctx.fillStyle = swordGrad;
+        // 劍身剪影
+        ctx.beginPath();
+        ctx.moveTo(0, -H * 0.36);
+        ctx.lineTo(18, H * 0.14);
+        ctx.lineTo(-18, H * 0.14);
+        ctx.closePath();
+        ctx.fill();
+        // 護手
+        ctx.fillRect(-52, H * 0.12, 104, 12);
+        ctx.fillRect(-7, H * 0.12, 14, 58);
+        ctx.restore();
+
+        // 漂浮發光單據
+        for (const inv of state.titleInvoices) {
+          inv.x += inv.vx * dt;
+          inv.y += inv.vy * dt;
+          inv.rot += inv.vrot * dt;
+          if (inv.y < -40) {
+            inv.y = H + 40;
+            inv.x = rand(0, W);
+          }
+          drawInvoicePaper(inv.x, inv.y, 34 * inv.scale, 44 * inv.scale, inv.rot, inv.label, true);
+        }
+      }
+
+      /* --------------------------------------------------------------------------
+       * 7. 第一關：《萬單齊發・恐龍刺蝟魔王》
+       * -------------------------------------------------------------------------- */
+      function initStage1() {
+        state.stage1 = {
+          bossHp: 100,
+          bossMaxHp: 100,
+          bossState: 'VULNERABLE', // VULNERABLE | CURLED
+          stateTimer: 4.5,
+          bossHitFlash: 0,
+          bossBob: 0,
+          combo: 0,
+          burstCharge: 0, // 0..100
+          projectiles: [], // 飛向魔王的單據
+          quills: [], // 魔王射出的尖刺
+          quillTimer: 2.2,
+          cleared: false,
+          clearDelay: 0
+        };
+        updateStage1Buttons();
+      }
+
+      function updateStage1Buttons() {
+        const s1 = state.stage1;
+        if (!s1) return;
+        const pct = Math.floor(s1.burstCharge);
+        btnHundredBurst.innerHTML = pct >= 100
+          ? '<span>🔥 釋放百單核爆！(已就緒)</span>'
+          : `<span>🔥 百單核爆 (${pct}%)</span>`;
+        btnHundredBurst.disabled = pct < 100 || s1.cleared;
+        btnHundredBurst.classList.toggle('opacity-50', pct < 100);
+        btnHundredBurst.classList.toggle('animate-roar', pct >= 100 && !s1.cleared);
+      }
+
+      function fireInvoiceStage1(targetX, targetY, isBurst = false) {
+        const s1 = state.stage1;
+        if (!s1 || s1.cleared || state.pausedForScroll) return;
+
+        const startX = W * 0.16 + rand(-18, 18);
+        const startY = H * 0.66 + rand(-24, 24);
+        const bx = targetX || W * 0.75 + rand(-30, 30);
+        const by = targetY || H * 0.52 + rand(-35, 35);
+
+        const dx = bx - startX;
+        const dy = by - startY;
+        const dist = Math.hypot(dx, dy) || 1;
+        const speed = isBurst ? rand(620, 820) : rand(540, 680);
+
+        s1.projectiles.push({
+          x: startX,
+          y: startY,
+          vx: (dx / dist) * speed,
+          vy: (dy / dist) * speed - rand(20, 65),
+          rot: rand(-0.5, 0.5),
+          vrot: rand(-8, 8),
+          label: INVOICE_LABELS[Math.floor(Math.random() * INVOICE_LABELS.length)],
+          golden: isBurst || Math.random() < 0.25,
+          isBurst,
+          reflected: false
+        });
+
+        state.stats.totalInvoices++;
+        if (!isBurst) {
+          audio.sfxPaperShoot();
+          spawnParticles(startX, startY, 3, { colors: ['#FFE89E', '#F4ECD8'], speedMin: 20, speedMax: 80, lifeMax: 0.4 });
+        }
+      }
+
+      function triggerHundredBurst() {
+        const s1 = state.stage1;
+        if (!s1 || s1.burstCharge < 100 || s1.cleared) return;
+        s1.burstCharge = 0;
+        // 強制破除刺球狀態
+        s1.bossState = 'VULNERABLE';
+        s1.stateTimer = 4.5;
+        audio.sfxComboBurst();
+        state.shake = 14;
+        state.flashAlpha = 0.45;
+        spawnFloatingText(W * 0.5, H * 0.28, '✦ 百單核爆・萬箭齊發！ ✦', { size: 30, color: '#FFE89E', stroke: '#C83E37', scalePop: true, life: 1.4 });
+
+        for (let i = 0; i < 24; i++) {
+          setTimeout(() => {
+            if (state.phase === 'STAGE1' && state.stage1 && !state.stage1.cleared) {
+              fireInvoiceStage1(W * 0.74 + rand(-55, 55), H * 0.52 + rand(-55, 55), true);
+            }
+          }, i * 32);
+        }
+        updateStage1Buttons();
+      }
+
+      function updateStage1(dt) {
+        const s1 = state.stage1;
+        if (!s1) return;
+
+        s1.bossBob += dt * 3.2;
+        if (s1.bossHitFlash > 0) s1.bossHitFlash -= dt * 4;
+
+        if (s1.cleared) {
+          s1.clearDelay -= dt;
+          if (s1.clearDelay <= 0) {
+            enterStageWithScroll('STAGE2');
+          }
+          return;
+        }
+
+        // 魔王狀態切換（露出破綻 <-> 捲縮刺球反彈）
+        s1.stateTimer -= dt;
+        if (s1.stateTimer <= 0) {
+          if (s1.bossState === 'VULNERABLE') {
+            s1.bossState = 'CURLED';
+            s1.stateTimer = 2.4;
+            spawnFloatingText(W * 0.74, H * 0.28, '⚠️ 魔王捲縮刺球・反彈單據！', { size: 19, color: '#ff9c8a' });
+          } else {
+            s1.bossState = 'VULNERABLE';
+            s1.stateTimer = 4.6;
+            spawnFloatingText(W * 0.74, H * 0.28, '✨ 破綻大開・全力印單！', { size: 20, color: '#FFE89E' });
+          }
+        }
+
+        // 魔王偶爾發射尖刺
+        s1.quillTimer -= dt;
+        if (s1.quillTimer <= 0) {
+          s1.quillTimer = rand(1.9, 3.0);
+          s1.quills.push({
+            x: W * 0.68,
+            y: H * 0.52 + rand(-50, 40),
+            vx: -rand(240, 320),
+            vy: rand(-25, 25),
+            rot: Math.PI
+          });
+        }
+
+        const bossX = W * 0.75;
+        const bossY = H * 0.55 + Math.sin(s1.bossBob) * 8;
+        const bossR = Math.min(W, H) * 0.18;
+
+        // 更新單據飛行
+        for (let i = s1.projectiles.length - 1; i >= 0; i--) {
+          const p = s1.projectiles[i];
+          p.x += p.vx * dt;
+          p.y += p.vy * dt;
+          p.vy += 120 * dt;
+          p.rot += p.vrot * dt;
+
+          // 若與魔王尖刺相撞，擊碎尖刺
+          if (!p.reflected) {
+            for (let qIdx = s1.quills.length - 1; qIdx >= 0; qIdx--) {
+              const q = s1.quills[qIdx];
+              if (Math.hypot(p.x - q.x, p.y - q.y) < 34) {
+                s1.quills.splice(qIdx, 1);
+                spawnParticles(q.x, q.y, 8, { colors: ['#FFE89E', '#C83E37'] });
+                spawnFloatingText(q.x, q.y - 12, '單據格擋!', { size: 15, color: '#FFE89E' });
+                break;
+              }
+            }
+          }
+
+          // 命中魔王判定
+          if (!p.reflected && Math.hypot(p.x - bossX, p.y - bossY) < bossR) {
+            if (s1.bossState === 'CURLED' && !p.isBurst) {
+              // 反彈！
+              p.reflected = true;
+              p.vx = -Math.abs(p.vx) * 0.7;
+              p.vy = -rand(160, 280);
+              s1.combo = Math.max(0, s1.combo - 2);
+              audio.sfxReflect();
+              spawnParticles(p.x, p.y, 6, { colors: ['#ff9c8a', '#FFE89E'], speedMax: 130 });
+              spawnFloatingText(p.x, p.y - 14, '刺球反彈!', { size: 16, color: '#ff9c8a' });
+            } else {
+              // 有效命中！
+              const dmg = p.isBurst ? 1.5 : (p.golden ? 2.6 : 1.7);
+              s1.bossHp = Math.max(0, s1.bossHp - dmg);
+              s1.bossHitFlash = 1;
+              s1.combo++;
+              if (!p.isBurst) {
+                s1.burstCharge = clamp(s1.burstCharge + 5.5, 0, 100);
+                audio.sfxBossHit();
+              }
+              state.shake = Math.max(state.shake, p.isBurst ? 6 : 3);
+              spawnParticles(p.x, p.y, p.isBurst ? 8 : 5, {
+                colors: ['#FFE89E', '#D9A74A', '#C83E37'],
+                shape: 'star',
+                speedMax: 160
+              });
+              if (s1.combo % 6 === 0) {
+                spawnFloatingText(bossX + rand(-40, 40), bossY - bossR * 0.7, `${s1.combo} 連銷!`, { size: 22, color: '#FFE89E', scalePop: true });
+              }
+              s1.projectiles.splice(i, 1);
+              updateStage1Buttons();
+
+              if (s1.bossHp <= 0 && !s1.cleared) {
+                s1.cleared = true;
+                s1.clearDelay = 2.0;
+                audio.sfxComboBurst();
+                state.shake = 18;
+                state.flashAlpha = 0.65;
+                spawnParticles(bossX, bossY, 80, {
+                  colors: ['#FFE89E', '#D9A74A', '#F4ECD8', '#C83E37'],
+                  speedMin: 80,
+                  speedMax: 340,
+                  sizeMin: 3,
+                  sizeMax: 8,
+                  lifeMax: 1.8,
+                  shape: 'star'
+                });
+                spawnFloatingText(W * 0.5, H * 0.42, '✦ 恐龍刺蝟魔王化作金粉！ ✦', { size: 28, color: '#FFE89E', stroke: '#121526', life: 1.9, scalePop: true });
+                updateStage1Buttons();
+              }
+              continue;
+            }
+          }
+
+          if (p.x > W + 80 || p.x < -80 || p.y > H + 80) {
+            s1.projectiles.splice(i, 1);
+          }
+        }
+
+        // 更新魔王尖刺
+        for (let i = s1.quills.length - 1; i >= 0; i--) {
+          const q = s1.quills[i];
+          q.x += q.vx * dt;
+          q.y += q.vy * dt;
+          if (q.x < W * 0.18 && Math.abs(q.y - H * 0.66) < 42) {
+            s1.quills.splice(i, 1);
+            s1.combo = 0;
+            state.shake = 5;
+            audio.sfxSnailBonk();
+            spawnFloatingText(W * 0.18, H * 0.56, '哎呀! 連擊中斷', { size: 16, color: '#ff9c8a' });
+          } else if (q.x < -40) {
+            s1.quills.splice(i, 1);
+          }
+        }
+
+        hudCenterText.textContent = `魔王血量 ${Math.ceil(s1.bossHp)}% ｜ 消費狂潮 ${s1.combo} 連擊`;
+      }
+
+      function drawDinosaurHedgehogBoss(cx, cy, r, s1) {
+        ctx.save();
+        ctx.translate(cx, cy);
+
+        if (s1.bossHitFlash > 0) {
+          ctx.translate(rand(-4, 4), rand(-3, 3));
+        }
+
+        if (s1.bossState === 'CURLED') {
+          // 捲縮刺球防禦型態
+          ctx.rotate(state.time * 4.5);
+          ctx.shadowColor = 'rgba(200, 62, 55, 0.75)';
+          ctx.shadowBlur = 24;
+
+          // 外圈滿滿刺蝟尖刺
+          const spikes = 22;
+          ctx.fillStyle = '#FFE89E';
+          ctx.strokeStyle = '#C83E37';
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          for (let i = 0; i < spikes * 2; i++) {
+            const rad = i % 2 === 0 ? r * 1.18 : r * 0.72;
+            const a = (i / (spikes * 2)) * Math.PI * 2;
+            if (i === 0) ctx.moveTo(Math.cos(a) * rad, Math.sin(a) * rad);
+            else ctx.lineTo(Math.cos(a) * rad, Math.sin(a) * rad);
+          }
+          ctx.closePath();
+          ctx.fill();
+          ctx.stroke();
+
+          // 球體核心
+          const coreGrad = ctx.createRadialGradient(-r * 0.2, -r * 0.2, 6, 0, 0, r * 0.75);
+          coreGrad.addColorStop(0, '#5a3a5e');
+          coreGrad.addColorStop(1, '#1f162c');
+          ctx.fillStyle = coreGrad;
+          ctx.beginPath();
+          ctx.arc(0, 0, r * 0.72, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.strokeStyle = '#D9A74A';
+          ctx.lineWidth = 3;
+          ctx.stroke();
+        } else {
+          // 霸氣恐龍身軀 + 刺蝟尖刺背脊
+          ctx.shadowColor = s1.bossHitFlash > 0.2 ? 'rgba(255, 232, 158, 0.95)' : 'rgba(217, 167, 74, 0.35)';
+          ctx.shadowBlur = 20;
+
+          // 尾巴
+          ctx.fillStyle = '#2d4a46';
+          ctx.strokeStyle = '#D9A74A';
+          ctx.lineWidth = 2.5;
+          ctx.beginPath();
+          ctx.moveTo(r * 0.45, r * 0.35);
+          ctx.quadraticCurveTo(r * 1.15, r * 0.55, r * 1.25, -r * 0.05);
+          ctx.quadraticCurveTo(r * 0.9, r * 0.25, r * 0.45, r * 0.05);
+          ctx.closePath();
+          ctx.fill();
+          ctx.stroke();
+
+          // 背部滿滿的金色刺蝟尖刺
+          ctx.fillStyle = '#e8c474';
+          ctx.strokeStyle = '#7a4d12';
+          ctx.lineWidth = 1.6;
+          for (let i = 0; i < 11; i++) {
+            const t = i / 10;
+            const sx = lerp(-r * 0.25, r * 0.78, t);
+            const sy = lerp(-r * 0.85, r * 0.15, t) - Math.sin(t * Math.PI) * r * 0.2;
+            const angle = lerp(-2.1, -0.35, t);
+            ctx.save();
+            ctx.translate(sx, sy);
+            ctx.rotate(angle);
+            ctx.beginPath();
+            ctx.moveTo(0, -8);
+            ctx.lineTo(r * 0.45, 0);
+            ctx.lineTo(0, 8);
+            ctx.closePath();
+            ctx.fill();
+            ctx.stroke();
+            ctx.restore();
+          }
+
+          // 恐龍身軀
+          const bodyGrad = ctx.createLinearGradient(-r, -r, r, r);
+          bodyGrad.addColorStop(0, s1.bossHitFlash > 0.3 ? '#8c3b36' : '#326356');
+          bodyGrad.addColorStop(1, '#1a2f2d');
+          ctx.fillStyle = bodyGrad;
+          ctx.strokeStyle = '#D9A74A';
+          ctx.lineWidth = 2.6;
+          ctx.beginPath();
+          ctx.ellipse(r * 0.08, r * 0.18, r * 0.68, r * 0.62, -0.15, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.stroke();
+
+          // 羊皮紙色肚皮
+          ctx.fillStyle = '#e7d6b1';
+          ctx.beginPath();
+          ctx.ellipse(-r * 0.16, r * 0.28, r * 0.32, r * 0.42, 0.2, 0, Math.PI * 2);
+          ctx.fill();
+
+          // 恐龍頭部
+          ctx.fillStyle = bodyGrad;
+          ctx.beginPath();
+          ctx.roundRect(-r * 0.92, -r * 0.88, r * 0.95, r * 0.62, 22);
+          ctx.fill();
+          ctx.stroke();
+
+          // 銳利眼睛
+          ctx.fillStyle = '#FFE89E';
+          ctx.beginPath();
+          ctx.arc(-r * 0.52, -r * 0.62, r * 0.11, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.fillStyle = '#C83E37';
+          ctx.beginPath();
+          ctx.arc(-r * 0.55, -r * 0.62, r * 0.055, 0, Math.PI * 2);
+          ctx.fill();
+
+          // 霸氣獠牙
+          ctx.fillStyle = '#F4ECD8';
+          for (let t = 0; t < 3; t++) {
+            const tx = -r * 0.82 + t * r * 0.18;
+            ctx.beginPath();
+            ctx.moveTo(tx, -r * 0.32);
+            ctx.lineTo(tx + 6, -r * 0.18);
+            ctx.lineTo(tx + 12, -r * 0.32);
+            ctx.closePath();
+            ctx.fill();
+          }
+
+          // 小巧反差萌前爪
+          ctx.fillStyle = '#326356';
+          ctx.strokeStyle = '#D9A74A';
+          ctx.beginPath();
+          ctx.ellipse(-r * 0.45, r * 0.12, r * 0.18, r * 0.09, 0.4, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.stroke();
+        }
+        ctx.restore();
+      }
+
+      function drawStage1() {
+        const s1 = state.stage1;
+        // 戰場深藍鎏金背景
+        const bg = ctx.createLinearGradient(0, 0, W, H);
+        bg.addColorStop(0, '#171930');
+        bg.addColorStop(0.55, '#1f162b');
+        bg.addColorStop(1, '#101220');
+        ctx.fillStyle = bg;
+        ctx.fillRect(0, 0, W, H);
+
+        drawArtNouveauHalo(W * 0.75, H * 0.52, Math.min(W, H) * 0.32, 0.18);
+
+        // 地面石台
+        ctx.fillStyle = 'rgba(217, 167, 74, 0.12)';
+        ctx.fillRect(0, H * 0.78, W, H * 0.22);
+        ctx.strokeStyle = 'rgba(217, 167, 74, 0.45)';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(0, H * 0.78);
+        ctx.lineTo(W, H * 0.78);
+        ctx.stroke();
+
+        // 左側玩家鎏金印單法陣
+        const px = W * 0.15;
+        const py = H * 0.66;
+        ctx.save();
+        ctx.translate(px, py);
+        ctx.strokeStyle = '#D9A74A';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.arc(0, 0, 36 + Math.sin(state.time * 4) * 3, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.fillStyle = 'rgba(217, 167, 74, 0.2)';
+        ctx.fill();
+        ctx.fillStyle = '#FFE89E';
+        ctx.font = '900 18px "Noto Serif TC", serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('印單', 0, 0);
+        ctx.restore();
+
+        // 繪製恐龍刺蝟魔王
+        if (!s1.cleared) {
+          const bossX = W * 0.75;
+          const bossY = H * 0.55 + Math.sin(s1.bossBob) * 8;
+          const bossR = Math.min(W, H) * 0.18;
+          drawDinosaurHedgehogBoss(bossX, bossY, bossR, s1);
+
+          // 魔王血條（上方鎏金框）
+          const barW = Math.min(W * 0.56, 360);
+          const barH = 16;
+          const bx = W * 0.5 - barW / 2;
+          const by = 24;
+          ctx.fillStyle = 'rgba(11, 13, 25, 0.85)';
+          ctx.strokeStyle = '#D9A74A';
+          ctx.lineWidth = 1.8;
+          ctx.beginPath();
+          ctx.roundRect(bx, by, barW, barH, 99);
+          ctx.fill();
+          ctx.stroke();
+
+          const hpGrad = ctx.createLinearGradient(bx, by, bx + barW, by);
+          hpGrad.addColorStop(0, '#C83E37');
+          hpGrad.addColorStop(1, '#FFE89E');
+          ctx.fillStyle = hpGrad;
+          ctx.beginPath();
+          ctx.roundRect(bx + 2, by + 2, Math.max(0, (barW - 4) * (s1.bossHp / s1.bossMaxHp)), barH - 4, 99);
+          ctx.fill();
+
+          ctx.fillStyle = '#F4ECD8';
+          ctx.font = '700 13px "Noto Serif TC", serif';
+          ctx.textAlign = 'center';
+          ctx.fillText(
+            s1.bossState === 'CURLED'
+              ? '恐龍刺蝟魔王【刺球反彈中！稍候或放核爆】'
+              : '恐龍刺蝟魔王【破綻大開！狂點畫面消費印單】',
+            W * 0.5,
+            by + 34
+          );
+        }
+
+        // 魔王射出的尖刺
+        for (const q of s1.quills) {
+          ctx.save();
+          ctx.translate(q.x, q.y);
+          ctx.fillStyle = '#ff9c8a';
+          ctx.strokeStyle = '#C83E37';
+          ctx.lineWidth = 1.5;
+          ctx.beginPath();
+          ctx.moveTo(-18, 0);
+          ctx.lineTo(14, -6);
+          ctx.lineTo(8, 0);
+          ctx.lineTo(14, 6);
+          ctx.closePath();
+          ctx.fill();
+          ctx.stroke();
+          ctx.restore();
+        }
+
+        // 飛射單據
+        for (const p of s1.projectiles) {
+          drawInvoicePaper(p.x, p.y, p.isBurst ? 34 : 30, p.isBurst ? 42 : 38, p.rot, p.label, p.golden);
+        }
+      }
+
+      /* --------------------------------------------------------------------------
+       * 8. 第二關：《送件不送・蝸牛勇闖山林》
+       * -------------------------------------------------------------------------- */
+      function initStage2() {
+        const fireflies = [];
+        for (let i = 0; i < 24; i++) {
+          fireflies.push({
+            x: rand(0, W),
+            y: rand(H * 0.12, H * 0.72),
+            r: rand(1.5, 3.8),
+            phase: rand(0, Math.PI * 2)
+          });
+        }
+        state.stage2 = {
+          progress: 0, // 0..100
+          scrollX: 0,
+          snailY: 0, // 0 = 地面，負值 = 跳起
+          snailVy: 0,
+          onGround: true,
+          retractTimer: 0, // 撞到障礙時縮殼停滯
+          shieldTimer: 0, // 穩住單據短暫加速與護盾
+          steadyCooldown: 0,
+          stackCount: 8, // 背上單據山層數
+          obstacles: [],
+          dews: [],
+          spawnTimer: 1.6,
+          dewTimer: 1.4,
+          stepAccum: 0,
+          fireflies,
+          cleared: false,
+          clearDelay: 0
+        };
+      }
+
+      function snailJump() {
+        const s2 = state.stage2;
+        if (!s2 || s2.cleared || state.pausedForScroll) return;
+        if (s2.retractTimer > 0) {
+          // 縮殼時點擊可提前鼓起勇氣出來
+          s2.retractTimer = Math.max(0, s2.retractTimer - 0.35);
+          spawnFloatingText(W * 0.24, H * 0.65, '鼓起勇氣！', { size: 16, color: '#FFE89E' });
+          return;
+        }
+        if (s2.onGround) {
+          s2.snailVy = -490;
+          s2.onGround = false;
+          audio.sfxSnailJump();
+          spawnParticles(W * 0.24, H * 0.78, 8, { colors: ['#FFE89E', '#8CE0C3'], speedMax: 100, lifeMax: 0.5 });
+        }
+      }
+
+      function snailSteadyBoost() {
+        const s2 = state.stage2;
+        if (!s2 || s2.cleared || state.pausedForScroll) return;
+        if (s2.steadyCooldown > 0) {
+          showToast('蝸牛正在喘氣，稍等一下再穩住單據！');
+          return;
+        }
+        s2.retractTimer = 0;
+        s2.shieldTimer = 2.4;
+        s2.steadyCooldown = 4.2;
+        s2.stackCount = Math.min(12, s2.stackCount + 2);
+        state.stats.totalInvoices += 2;
+        audio.sfxDewCollect();
+        spawnFloatingText(W * 0.26, H * 0.52, '🍃 送件不送・穩如泰山！', { size: 19, color: '#8CE0C3', scalePop: true });
+        spawnParticles(W * 0.24, H * 0.66, 14, { colors: ['#FFE89E', '#8CE0C3'], shape: 'star', speedMax: 140 });
+      }
+
+      function updateStage2(dt) {
+        const s2 = state.stage2;
+        if (!s2) return;
+
+        if (s2.cleared) {
+          s2.clearDelay -= dt;
+          if (s2.clearDelay <= 0) {
+            enterStageWithScroll('STAGE3');
+          }
+          return;
+        }
+
+        if (s2.steadyCooldown > 0) s2.steadyCooldown = Math.max(0, s2.steadyCooldown - dt);
+        if (s2.shieldTimer > 0) s2.shieldTimer = Math.max(0, s2.shieldTimer - dt);
+
+        // 蝸牛前進速度（縮殼時停滯不前）
+        let speed = 165;
+        if (s2.retractTimer > 0) {
+          s2.retractTimer -= dt;
+          speed = 0;
+        } else if (s2.shieldTimer > 0) {
+          speed = 245;
+        }
+
+        s2.scrollX += speed * dt;
+        s2.progress = clamp(s2.progress + (speed / 3600) * 100 * dt, 0, 100);
+        s2.stepAccum += speed * dt * 0.08;
+        if (s2.stepAccum >= 1) {
+          const steps = Math.floor(s2.stepAccum);
+          state.stats.snailSteps += steps;
+          s2.stepAccum -= steps;
+        }
+
+        // 蝸牛跳躍物理
+        if (!s2.onGround) {
+          s2.snailVy += 1180 * dt;
+          s2.snailY += s2.snailVy * dt;
+          if (s2.snailY >= 0) {
+            s2.snailY = 0;
+            s2.snailVy = 0;
+            s2.onGround = true;
+          }
+        }
+
+        // 生成障礙物（退件荊棘 & 催件巨石）
+        if (s2.progress < 90) {
+          s2.spawnTimer -= dt;
+          if (s2.spawnTimer <= 0) {
+            s2.spawnTimer = rand(1.75, 2.65);
+            const type = Math.random() < 0.55 ? 'THORN' : 'BOULDER';
+            s2.obstacles.push({
+              type,
+              x: W + 60,
+              y: H * 0.78,
+              r: type === 'THORN' ? 24 : 26,
+              rot: 0,
+              hit: false
+            });
+          }
+
+          // 生成空中山林靈露
+          s2.dewTimer -= dt;
+          if (s2.dewTimer <= 0) {
+            s2.dewTimer = rand(1.5, 2.3);
+            s2.dews.push({
+              x: W + 40,
+              y: H * 0.78 - rand(68, 128),
+              r: 15,
+              phase: rand(0, Math.PI * 2)
+            });
+          }
+        }
+
+        const snailX = W * 0.24;
+        const snailGroundY = H * 0.78 + s2.snailY;
+
+        // 更新障礙物
+        for (let i = s2.obstacles.length - 1; i >= 0; i--) {
+          const ob = s2.obstacles[i];
+          const obSpeed = ob.type === 'BOULDER' ? speed * 1.28 + 50 : speed;
+          ob.x -= obSpeed * dt;
+          if (ob.type === 'BOULDER') ob.rot -= dt * 5;
+
+          // 碰撞檢測
+          if (!ob.hit && Math.abs(ob.x - snailX) < 38 && Math.abs((ob.y - 16) - (snailGroundY - 20)) < 36) {
+            ob.hit = true;
+            if (s2.shieldTimer > 0) {
+              // 穩住狀態直接彈開障礙
+              spawnParticles(ob.x, ob.y - 16, 12, { colors: ['#FFE89E', '#8CE0C3'], shape: 'star' });
+              spawnFloatingText(ob.x, ob.y - 45, '輕鬆彈開！', { size: 16, color: '#FFE89E' });
+              s2.obstacles.splice(i, 1);
+              continue;
+            } else {
+              s2.retractTimer = 1.05;
+              s2.stackCount = Math.max(3, s2.stackCount - 2);
+              state.shake = 7;
+              audio.sfxSnailBonk();
+              spawnParticles(snailX, snailGroundY - 45, 5, { colors: ['#F4ECD8'], shape: 'paper', sizeMin: 6, sizeMax: 9, speedMax: 150 });
+              spawnFloatingText(snailX, snailGroundY - 72, ob.type === 'THORN' ? '退件荊棘! 先縮殼躲一下' : '催件巨石! 單據別飛呀', {
+                size: 16,
+                color: '#ffad9e'
+              });
+            }
+          }
+
+          if (ob.x < -80) s2.obstacles.splice(i, 1);
+        }
+
+        // 更新山林靈露
+        for (let i = s2.dews.length - 1; i >= 0; i--) {
+          const d = s2.dews[i];
+          d.x -= (speed + 25) * dt;
+          d.phase += dt * 4;
+          const dy = d.y + Math.sin(d.phase) * 7;
+
+          if (Math.hypot(d.x - snailX, dy - (snailGroundY - 34)) < 48) {
+            s2.dews.splice(i, 1);
+            s2.progress = clamp(s2.progress + 5.5, 0, 100);
+            s2.stackCount = Math.min(12, s2.stackCount + 1);
+            state.stats.totalInvoices++;
+            audio.sfxDewCollect();
+            spawnParticles(d.x, dy, 12, { colors: ['#8CE0C3', '#FFE89E'], shape: 'star' });
+            spawnFloatingText(d.x, dy - 16, '✨ 山林靈露 +進度', { size: 17, color: '#8CE0C3' });
+            continue;
+          }
+          if (d.x < -40) s2.dews.splice(i, 1);
+        }
+
+        // 更新螢火蟲
+        for (const f of s2.fireflies) {
+          f.phase += dt * 2.5;
+          f.x -= (speed * 0.25 + 12) * dt;
+          if (f.x < -10) {
+            f.x = W + 10;
+            f.y = rand(H * 0.12, H * 0.72);
+          }
+        }
+
+        // 抵達山林送件亭過關
+        if (s2.progress >= 100 && !s2.cleared) {
+          s2.cleared = true;
+          s2.clearDelay = 2.0;
+          audio.sfxComboBurst();
+          spawnParticles(W * 0.75, H * 0.62, 50, { colors: ['#FFE89E', '#8CE0C3', '#F4ECD8'], shape: 'star', speedMax: 240 });
+          spawnFloatingText(W * 0.5, H * 0.36, '✦ 抵達山林送件亭・蝸牛大勝利！ ✦', { size: 25, color: '#FFE89E', life: 1.9, scalePop: true });
+        }
+
+        hudCenterText.textContent = `山林路程 ${Math.floor(s2.progress)}% ｜ 背負單據 ${s2.stackCount} 疊`;
+      }
+
+      function drawEmeraldMountainLayer(offset, heightRatio, color, ridgeAmp) {
+        ctx.fillStyle = color;
+        ctx.beginPath();
+        ctx.moveTo(0, H);
+        const step = 48;
+        for (let x = -step; x <= W + step; x += step) {
+          const wx = x + offset;
+          const y = H * heightRatio
+            - Math.sin(wx * 0.0045) * ridgeAmp
+            - Math.cos(wx * 0.011) * (ridgeAmp * 0.45);
+          ctx.lineTo(x, y);
+        }
+        ctx.lineTo(W, H);
+        ctx.closePath();
+        ctx.fill();
+      }
+
+      function drawCuteArtSnail(x, y, s2) {
+        ctx.save();
+        ctx.translate(x, y);
+
+        // 護盾金光
+        if (s2.shieldTimer > 0) {
+          ctx.save();
+          ctx.strokeStyle = '#FFE89E';
+          ctx.fillStyle = 'rgba(255, 232, 158, 0.14)';
+          ctx.lineWidth = 2.2;
+          ctx.beginPath();
+          ctx.arc(0, -34, 58, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.stroke();
+          ctx.restore();
+        }
+
+        const retracted = s2.retractTimer > 0;
+
+        // 蝸牛柔軟身體
+        if (!retracted) {
+          ctx.fillStyle = '#F4ECD8';
+          ctx.strokeStyle = '#D9A74A';
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.moveTo(-42, 0);
+          ctx.quadraticCurveTo(0, -14, 42, -6);
+          ctx.quadraticCurveTo(50, -18, 42, -26);
+          ctx.quadraticCurveTo(26, -24, 18, -14);
+          ctx.lineTo(-42, 0);
+          ctx.closePath();
+          ctx.fill();
+          ctx.stroke();
+
+          // 兩根可愛觸角與大眼
+          ctx.strokeStyle = '#D9A74A';
+          ctx.lineWidth = 2.2;
+          ctx.beginPath();
+          ctx.moveTo(36, -22);
+          ctx.lineTo(44, -40);
+          ctx.moveTo(42, -20);
+          ctx.lineTo(54, -36);
+          ctx.stroke();
+
+          ctx.fillStyle = '#121526';
+          ctx.beginPath();
+          ctx.arc(44, -41, 3.2, 0, Math.PI * 2);
+          ctx.arc(54, -37, 3.2, 0, Math.PI * 2);
+          ctx.fill();
+        }
+
+        // 新藝術螺旋金紋蝸牛殼
+        const shellGrad = ctx.createRadialGradient(-8, -32, 4, -4, -28, 32);
+        shellGrad.addColorStop(0, '#FFE89E');
+        shellGrad.addColorStop(0.6, '#D9A74A');
+        shellGrad.addColorStop(1, '#7c5319');
+        ctx.fillStyle = shellGrad;
+        ctx.strokeStyle = '#24594B';
+        ctx.lineWidth = 2.2;
+        ctx.beginPath();
+        ctx.arc(-4, -28, 28, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+
+        // 螺旋紋
+        ctx.strokeStyle = '#121526';
+        ctx.lineWidth = 1.6;
+        ctx.beginPath();
+        for (let a = 0; a < Math.PI * 4.2; a += 0.25) {
+          const rr = a * 1.75;
+          const sx = -4 + Math.cos(a) * rr;
+          const sy = -28 + Math.sin(a) * rr;
+          if (a === 0) ctx.moveTo(sx, sy);
+          else ctx.lineTo(sx, sy);
+        }
+        ctx.stroke();
+
+        // 殼頂上疊得高高的單據山！
+        const sway = Math.sin(state.time * 4.5) * 2.5;
+        for (let i = 0; i < s2.stackCount; i++) {
+          const ix = -6 + Math.sin(i * 1.1) * 3 + sway * (i * 0.14);
+          const iy = -58 - i * 7.5;
+          drawInvoicePaper(ix, iy, 34, 14, Math.sin(i) * 0.08, '', i === s2.stackCount - 1);
+        }
+
+        ctx.restore();
+      }
+
+      function drawStage2() {
+        const s2 = state.stage2;
+        // 唯美水墨翡翠山林天空
+        const sky = ctx.createLinearGradient(0, 0, 0, H);
+        sky.addColorStop(0, '#132629');
+        sky.addColorStop(0.5, '#1d443c');
+        sky.addColorStop(1, '#10211d');
+        ctx.fillStyle = sky;
+        ctx.fillRect(0, 0, W, H);
+
+        // 柔和金月與雲霧光暈
+        drawArtNouveauHalo(W * 0.78, H * 0.24, 58, 0.28);
+        ctx.fillStyle = '#FFE89E';
+        ctx.beginPath();
+        ctx.arc(W * 0.78, H * 0.24, 32, 0, Math.PI * 2);
+        ctx.fill();
+
+        // 多層次視差滾動遠山
+        drawEmeraldMountainLayer(s2.scrollX * 0.15, 0.56, 'rgba(20, 52, 46, 0.75)', 46);
+        drawEmeraldMountainLayer(s2.scrollX * 0.35, 0.66, 'rgba(30, 74, 62, 0.85)', 36);
+        drawEmeraldMountainLayer(s2.scrollX * 0.6, 0.74, 'rgba(18, 43, 37, 0.95)', 22);
+
+        // 漂浮螢火蟲
+        for (const f of s2.fireflies) {
+          const glow = 0.4 + 0.6 * Math.abs(Math.sin(f.phase));
+          ctx.save();
+          ctx.globalAlpha = glow;
+          ctx.fillStyle = '#FFE89E';
+          ctx.shadowColor = '#FFE89E';
+          ctx.shadowBlur = 10;
+          ctx.beginPath();
+          ctx.arc(f.x, f.y, f.r, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.restore();
+        }
+
+        // 山林泥土與青苔道路
+        ctx.fillStyle = '#182b24';
+        ctx.fillRect(0, H * 0.78, W, H * 0.22);
+        ctx.strokeStyle = '#D9A74A';
+        ctx.lineWidth = 2.2;
+        ctx.beginPath();
+        ctx.moveTo(0, H * 0.78);
+        ctx.lineTo(W, H * 0.78);
+        ctx.stroke();
+
+        // 終點「山林送件亭」（進度 > 78% 時緩緩出現）
+        if (s2.progress > 78) {
+          const pavX = lerp(W + 120, W * 0.78, clamp((s2.progress - 78) / 22, 0, 1));
+          const pavY = H * 0.78;
+          ctx.save();
+          ctx.translate(pavX, pavY);
+          // 亭柱
+          ctx.fillStyle = '#C83E37';
+          ctx.fillRect(-46, -92, 10, 92);
+          ctx.fillRect(36, -92, 10, 92);
+          // 飛簷屋頂
+          ctx.fillStyle = '#24594B';
+          ctx.strokeStyle = '#FFE89E';
+          ctx.lineWidth = 2.5;
+          ctx.beginPath();
+          ctx.moveTo(-72, -88);
+          ctx.quadraticCurveTo(0, -142, 72, -88);
+          ctx.closePath();
+          ctx.fill();
+          ctx.stroke();
+          // 匾額
+          ctx.fillStyle = '#121526';
+          ctx.fillRect(-34, -102, 68, 22);
+          ctx.strokeRect(-34, -102, 68, 22);
+          ctx.fillStyle = '#FFE89E';
+          ctx.font = '700 13px "Noto Serif TC", serif';
+          ctx.textAlign = 'center';
+          ctx.fillText('送件亭', 0, -87);
+          ctx.restore();
+        }
+
+        // 障礙物：退件荊棘 & 催件巨石
+        for (const ob of s2.obstacles) {
+          ctx.save();
+          ctx.translate(ob.x, ob.y);
+          if (ob.type === 'THORN') {
+            ctx.fillStyle = '#7c2128';
+            ctx.strokeStyle = '#ff9c8a';
+            ctx.lineWidth = 1.6;
+            for (let k = -1; k <= 1; k++) {
+              ctx.beginPath();
+              ctx.moveTo(k * 12 - 9, 0);
+              ctx.lineTo(k * 12, -34 - (k === 0 ? 10 : 0));
+              ctx.lineTo(k * 12 + 9, 0);
+              ctx.closePath();
+              ctx.fill();
+              ctx.stroke();
+            }
+          } else {
+            ctx.translate(0, -ob.r);
+            ctx.rotate(ob.rot);
+            ctx.fillStyle = '#4c4654';
+            ctx.strokeStyle = '#D9A74A';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.arc(0, 0, ob.r, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.stroke();
+            ctx.fillStyle = '#FFE89E';
+            ctx.font = '900 14px "Noto Serif TC", serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('催', 0, 0);
+          }
+          ctx.restore();
+        }
+
+        // 山林靈露
+        for (const d of s2.dews) {
+          const dy = d.y + Math.sin(d.phase) * 7;
+          ctx.save();
+          ctx.translate(d.x, dy);
+          ctx.shadowColor = '#8CE0C3';
+          ctx.shadowBlur = 14;
+          ctx.fillStyle = '#8CE0C3';
+          ctx.beginPath();
+          ctx.moveTo(0, -14);
+          ctx.quadraticCurveTo(13, 2, 0, 14);
+          ctx.quadraticCurveTo(-13, 2, 0, -14);
+          ctx.fill();
+          ctx.fillStyle = '#ffffff';
+          ctx.beginPath();
+          ctx.arc(-3, -2, 3, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.restore();
+        }
+
+        // 可愛大蝸牛
+        drawCuteArtSnail(W * 0.24, H * 0.78 + s2.snailY, s2);
+
+        // 上方山林進度條
+        const barW = Math.min(W * 0.56, 360);
+        const bx = W * 0.5 - barW / 2;
+        const by = 24;
+        ctx.fillStyle = 'rgba(11, 13, 25, 0.8)';
+        ctx.strokeStyle = '#D9A74A';
+        ctx.lineWidth = 1.8;
+        ctx.beginPath();
+        ctx.roundRect(bx, by, barW, 14, 99);
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.fillStyle = '#8CE0C3';
+        ctx.beginPath();
+        ctx.roundRect(bx + 2, by + 2, Math.max(0, (barW - 4) * (s2.progress / 100)), 10, 99);
+        ctx.fill();
+
+        ctx.fillStyle = '#F4ECD8';
+        ctx.font = '700 13px "Noto Serif TC", serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(`距離山林送件亭：${Math.floor(s2.progress)}%（點擊畫面或空白鍵跳躍）`, W * 0.5, by + 32);
+      }
+
+      /* --------------------------------------------------------------------------
+       * 9. 第三關：《核銷殿堂・女王的狂喜與清場咆哮》
+       * -------------------------------------------------------------------------- */
+      const QUEEN_LAUGHS = [
+        '哈哈哈！！',
+        '太棒了再多一點！！',
+        '超大聲笑開懷！！',
+        '積越久越開心呀哈哈！！',
+        '單據山好美喔哈哈哈！！'
+      ];
+
+      function initStage3() {
+        state.stage3 = {
+          joy: 0, // 0..100
+          pileInvoices: [], // 堆疊在殿堂地板的單據
+          fallingGolden: [], // 空中飄落的金色大額單據（可點擊接住）
+          goldenTimer: 1.5,
+          laughTimer: 1.8,
+          isHoldingPile: false,
+          holdAccum: 0,
+          roarTriggered: false,
+          roarTime: 0,
+          roarRings: [],
+          cleared: false,
+          clearDelay: 0
+        };
+        btnQueenRoar.classList.add('hidden');
+        btnPileInvoice.classList.remove('hidden');
+      }
+
+      function addInvoiceToPalace(x, golden = false) {
+        const s3 = state.stage3;
+        if (!s3 || s3.roarTriggered || state.pausedForScroll) return;
+
+        const pileCount = s3.pileInvoices.length;
+        // 越堆越高
+        const layerHeight = Math.min(H * 0.42, pileCount * 2.1);
+        const px = x !== undefined ? clamp(x, W * 0.14, W * 0.86) : W * 0.5 + rand(-W * 0.34, W * 0.34);
+        const py = H * 0.88 - rand(0, layerHeight + 24);
+
+        s3.pileInvoices.push({
+          x: px,
+          y: py,
+          vx: 0,
+          vy: 0,
+          rot: rand(-0.45, 0.45),
+          vrot: 0,
+          label: golden ? '鉅額單' : INVOICE_LABELS[Math.floor(Math.random() * INVOICE_LABELS.length)],
+          golden
+        });
+
+        // 限制畫面物件數避免過載，但維持視覺滿山滿谷
+        if (s3.pileInvoices.length > 210) {
+          s3.pileInvoices.shift();
+        }
+
+        state.stats.totalInvoices++;
+        const joyGain = golden ? 9.5 : 2.8;
+        s3.joy = clamp(s3.joy + joyGain, 0, 100);
+        state.stats.queenDecibels = Math.max(state.stats.queenDecibels, 68 + s3.joy * 0.72 + rand(0, 3.5));
+
+        audio.sfxInvoiceStack();
+        spawnParticles(px, py, golden ? 10 : 3, { colors: ['#FFE89E', '#F4ECD8'], shape: golden ? 'star' : 'circle', speedMax: 110 });
+
+        if (s3.joy >= 100 && btnQueenRoar.classList.contains('hidden')) {
+          btnQueenRoar.classList.remove('hidden');
+          audio.sfxQueenLaugh(1.0);
+          spawnFloatingText(W * 0.5, H * 0.22, '👑 女王狂喜 100%！快按下終極一吼！', {
+            size: 24,
+            color: '#FFE89E',
+            stroke: '#5B2A6B',
+            scalePop: true,
+            life: 1.8
+          });
+        }
+      }
+
+      function triggerQueenRoar() {
+        const s3 = state.stage3;
+        if (!s3 || s3.joy < 100 || s3.roarTriggered) return;
+
+        s3.roarTriggered = true;
+        s3.roarTime = 0;
+        s3.clearDelay = 2.8;
+        btnQueenRoar.classList.add('hidden');
+        btnPileInvoice.classList.add('hidden');
+
+        state.stats.queenDecibels = Math.max(state.stats.queenDecibels, 142.8);
+        audio.sfxQueenRoar();
+        state.shake = 24;
+        state.flashAlpha = 0.75;
+
+        // 產生多道毀天滅地的金色音波環
+        for (let i = 0; i < 5; i++) {
+          s3.roarRings.push({ r: 20 + i * 28, alpha: 1, speed: 480 + i * 70 });
+        }
+
+        // 所有堆積如山的單據瞬間向外炸飛並化作星塵！
+        const cx = W * 0.5;
+        const cy = H * 0.36;
+        for (const inv of s3.pileInvoices) {
+          const angle = Math.atan2(inv.y - cy, inv.x - cx) + rand(-0.3, 0.3);
+          const spd = rand(360, 780);
+          inv.vx = Math.cos(angle) * spd;
+          inv.vy = Math.sin(angle) * spd - rand(60, 180);
+          inv.vrot = rand(-14, 14);
+        }
+
+        spawnParticles(cx, cy, 90, {
+          colors: ['#FFE89E', '#D9A74A', '#F5B0FF', '#FFFFFF'],
+          speedMin: 100,
+          speedMax: 420,
+          sizeMin: 3,
+          sizeMax: 8,
+          lifeMax: 2.0,
+          gravity: 40,
+          shape: 'star'
+        });
+
+        spawnFloatingText(W * 0.5, H * 0.25, '喝啊啊啊——萬單清空！！', {
+          size: 34,
+          color: '#FFE89E',
+          stroke: '#C83E37',
+          life: 2.4,
+          vy: -18,
+          scalePop: true
+        });
+      }
+
+      function updateStage3(dt) {
+        const s3 = state.stage3;
+        if (!s3) return;
+
+        if (s3.roarTriggered) {
+          s3.roarTime += dt;
+          s3.clearDelay -= dt;
+          for (const ring of s3.roarRings) {
+            ring.r += ring.speed * dt;
+            ring.alpha = Math.max(0, ring.alpha - dt * 0.65);
+          }
+          for (let i = s3.pileInvoices.length - 1; i >= 0; i--) {
+            const inv = s3.pileInvoices[i];
+            inv.x += inv.vx * dt;
+            inv.y += inv.vy * dt;
+            inv.rot += inv.vrot * dt;
+            if (Math.random() < 0.25) {
+              spawnParticles(inv.x, inv.y, 1, { colors: ['#FFE89E', '#FFFFFF'], shape: 'star', lifeMax: 0.6, gravity: 0 });
+            }
+          }
+          if (s3.clearDelay <= 0) {
+            enterStageWithScroll('FINALE');
+          }
+          return;
+        }
+
+        // 隨時間自然累積核銷等待時間 → 女王越開心
+        s3.joy = clamp(s3.joy + dt * 2.4, 0, 100);
+        if (s3.isHoldingPile) {
+          s3.holdAccum += dt;
+          if (s3.holdAccum >= 0.14) {
+            s3.holdAccum = 0;
+            addInvoiceToPalace(undefined, false);
+          }
+        }
+
+        // 飄落金色大額單據
+        s3.goldenTimer -= dt;
+        if (s3.goldenTimer <= 0) {
+          s3.goldenTimer = rand(1.4, 2.2);
+          s3.fallingGolden.push({
+            x: rand(W * 0.16, W * 0.84),
+            y: -30,
+            vy: rand(75, 115),
+            phase: rand(0, Math.PI * 2)
+          });
+        }
+
+        for (let i = s3.fallingGolden.length - 1; i >= 0; i--) {
+          const g = s3.fallingGolden[i];
+          g.phase += dt * 3;
+          g.y += g.vy * dt;
+          g.x += Math.sin(g.phase) * 35 * dt;
+          if (g.y > H * 0.82) {
+            // 自動落入紙堆也算一點點累積
+            addInvoiceToPalace(g.x, false);
+            s3.fallingGolden.splice(i, 1);
+          }
+        }
+
+        // 女王狂喜大笑演出（越開心笑得越頻繁、字越大聲）
+        s3.laughTimer -= dt;
+        if (s3.laughTimer <= 0 && s3.joy > 12) {
+          const joyRatio = s3.joy / 100;
+          s3.laughTimer = lerp(2.2, 0.85, joyRatio);
+          audio.sfxQueenLaugh(joyRatio);
+          if (joyRatio > 0.5) state.shake = Math.max(state.shake, 3 + joyRatio * 5);
+
+          const text = QUEEN_LAUGHS[Math.floor(Math.random() * QUEEN_LAUGHS.length)];
+          const fontSize = Math.floor(20 + joyRatio * 18);
+          spawnFloatingText(
+            W * 0.5 + rand(-W * 0.28, W * 0.28),
+            H * 0.25 + rand(-30, 50),
+            text,
+            {
+              size: fontSize,
+              color: joyRatio > 0.65 ? '#FFE89E' : '#F5B0FF',
+              stroke: '#2c103b',
+              scalePop: true,
+              life: 1.3
+            }
+          );
+        }
+
+        if (s3.joy >= 100 && btnQueenRoar.classList.contains('hidden')) {
+          btnQueenRoar.classList.remove('hidden');
+        }
+
+        hudCenterText.textContent = `女王狂喜值 ${Math.floor(s3.joy)}% ｜ 殿堂單據 ${s3.pileInvoices.length} 份`;
+      }
+
+      function drawVerificationQueen(cx, cy, s3) {
+        const joyRatio = s3.joy / 100;
+        const bounce = s3.roarTriggered ? 0 : Math.sin(state.time * (4 + joyRatio * 8)) * (2 + joyRatio * 6);
+        const zoom = s3.roarTriggered ? 1.18 : 1;
+
+        ctx.save();
+        ctx.translate(cx, cy + bounce);
+        ctx.scale(zoom, zoom);
+
+        // 金碧輝煌王座靠背
+        ctx.fillStyle = '#3c184c';
+        ctx.strokeStyle = '#D9A74A';
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.roundRect(-64, -90, 128, 150, [64, 64, 12, 12]);
+        ctx.fill();
+        ctx.stroke();
+
+        // 女王華麗紫羅蘭披風與禮服
+        const dressGrad = ctx.createLinearGradient(0, -10, 0, 90);
+        dressGrad.addColorStop(0, '#72318a');
+        dressGrad.addColorStop(1, '#3b154a');
+        ctx.fillStyle = dressGrad;
+        ctx.beginPath();
+        ctx.moveTo(-48, 70);
+        ctx.quadraticCurveTo(-36, 0, 0, -6);
+        ctx.quadraticCurveTo(36, 0, 48, 70);
+        ctx.closePath();
+        ctx.fill();
+        ctx.strokeStyle = '#FFE89E';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        // 臉龐
+        ctx.fillStyle = '#FCEBD2';
+        ctx.strokeStyle = '#D9A74A';
+        ctx.lineWidth = 1.8;
+        ctx.beginPath();
+        ctx.arc(0, -32, 30, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+
+        // 腮紅（越開心越紅潤）
+        ctx.fillStyle = `rgba(224, 86, 110, ${0.22 + joyRatio * 0.35})`;
+        ctx.beginPath();
+        ctx.arc(-16, -26, 6, 0, Math.PI * 2);
+        ctx.arc(16, -26, 6, 0, Math.PI * 2);
+        ctx.fill();
+
+        // 鎏金皇冠
+        ctx.fillStyle = '#FFE89E';
+        ctx.strokeStyle = '#b98229';
+        ctx.lineWidth = 1.8;
+        ctx.beginPath();
+        ctx.moveTo(-24, -56);
+        ctx.lineTo(-28, -82);
+        ctx.lineTo(-10, -66);
+        ctx.lineTo(0, -90);
+        ctx.lineTo(10, -66);
+        ctx.lineTo(28, -82);
+        ctx.lineTo(24, -56);
+        ctx.closePath();
+        ctx.fill();
+        ctx.stroke();
+
+        // 表情動態切換：微笑 -> 眉開眼笑 -> 仰天大笑 -> 終極一吼！
+        ctx.strokeStyle = '#2b1236';
+        ctx.lineWidth = 2.6;
+        ctx.lineCap = 'round';
+
+        if (s3.roarTriggered) {
+          // 震撼全場的張口獅吼
+          ctx.beginPath();
+          ctx.moveTo(-18, -40);
+          ctx.lineTo(-7, -35);
+          ctx.moveTo(18, -40);
+          ctx.lineTo(7, -35);
+          ctx.stroke();
+
+          ctx.fillStyle = '#C83E37';
+          ctx.strokeStyle = '#FFE89E';
+          ctx.lineWidth = 2.5;
+          ctx.beginPath();
+          ctx.ellipse(0, -16, 18, 16, 0, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.stroke();
+        } else if (joyRatio >= 0.66) {
+          // 仰天大笑笑開懷！
+          ctx.beginPath();
+          ctx.arc(-12, -36, 7, Math.PI * 1.1, Math.PI * 1.9);
+          ctx.stroke();
+          ctx.beginPath();
+          ctx.arc(12, -36, 7, Math.PI * 1.1, Math.PI * 1.9);
+          ctx.stroke();
+
+          ctx.fillStyle = '#C83E37';
+          ctx.beginPath();
+          ctx.arc(0, -22, 13, 0, Math.PI);
+          ctx.closePath();
+          ctx.fill();
+          ctx.stroke();
+        } else if (joyRatio >= 0.33) {
+          // 眉開眼笑
+          ctx.beginPath();
+          ctx.arc(-12, -36, 6, Math.PI * 1.15, Math.PI * 1.85);
+          ctx.stroke();
+          ctx.beginPath();
+          ctx.arc(12, -36, 6, Math.PI * 1.15, Math.PI * 1.85);
+          ctx.stroke();
+
+          ctx.beginPath();
+          ctx.arc(0, -24, 9, 0.1 * Math.PI, 0.9 * Math.PI);
+          ctx.stroke();
+        } else {
+          // 優雅微笑
+          ctx.fillStyle = '#2b1236';
+          ctx.beginPath();
+          ctx.arc(-11, -36, 3.2, 0, Math.PI * 2);
+          ctx.arc(11, -36, 3.2, 0, Math.PI * 2);
+          ctx.fill();
+
+          ctx.beginPath();
+          ctx.arc(0, -26, 7, 0.2 * Math.PI, 0.8 * Math.PI);
+          ctx.stroke();
+        }
+
+        ctx.restore();
+      }
+
+      function drawStage3() {
+        const s3 = state.stage3;
+        // 金碧輝煌女王紫羅蘭宮廷殿堂
+        const bg = ctx.createRadialGradient(W * 0.5, H * 0.35, 30, W * 0.5, H * 0.5, Math.max(W, H) * 0.78);
+        bg.addColorStop(0, '#5B2A6B');
+        bg.addColorStop(0.55, '#2b143b');
+        bg.addColorStop(1, '#120b1f');
+        ctx.fillStyle = bg;
+        ctx.fillRect(0, 0, W, H);
+
+        // 殿堂鎏金柱列
+        ctx.fillStyle = 'rgba(217, 167, 74, 0.12)';
+        ctx.fillRect(W * 0.08, 0, 26, H);
+        ctx.fillRect(W * 0.92 - 26, 0, 26, H);
+
+        drawArtNouveauHalo(W * 0.5, H * 0.36, Math.min(W, H) * 0.3, 0.26 + (s3.joy / 100) * 0.22);
+
+        // 繪製端坐王座的核銷女王
+        drawVerificationQueen(W * 0.5, H * 0.42, s3);
+
+        // 殿堂堆積如山的單據
+        for (const inv of s3.pileInvoices) {
+          drawInvoicePaper(inv.x, inv.y, 34, 42, inv.rot, inv.label, inv.golden);
+        }
+
+        // 飄落的金色大額單據（提示玩家點擊接住）
+        if (!s3.roarTriggered) {
+          for (const g of s3.fallingGolden) {
+            drawInvoicePaper(g.x, g.y, 44, 54, Math.sin(g.phase) * 0.22, '鉅額單', true);
+          }
+        }
+
+        // 終極一吼金色音波環
+        for (const ring of s3.roarRings) {
+          ctx.save();
+          ctx.globalAlpha = ring.alpha;
+          ctx.strokeStyle = '#FFE89E';
+          ctx.lineWidth = 8 * ring.alpha + 2;
+          ctx.shadowColor = '#FFE89E';
+          ctx.shadowBlur = 24;
+          ctx.beginPath();
+          ctx.arc(W * 0.5, H * 0.36, ring.r, 0, Math.PI * 2);
+          ctx.stroke();
+          ctx.restore();
+        }
+
+        // 上方女王狂喜值進度條
+        if (!s3.roarTriggered) {
+          const barW = Math.min(W * 0.56, 360);
+          const bx = W * 0.5 - barW / 2;
+          const by = 22;
+          ctx.fillStyle = 'rgba(18, 11, 31, 0.85)';
+          ctx.strokeStyle = '#FFE89E';
+          ctx.lineWidth = 1.8;
+          ctx.beginPath();
+          ctx.roundRect(bx, by, barW, 15, 99);
+          ctx.fill();
+          ctx.stroke();
+
+          const joyGrad = ctx.createLinearGradient(bx, by, bx + barW, by);
+          joyGrad.addColorStop(0, '#c062e0');
+          joyGrad.addColorStop(1, '#FFE89E');
+          ctx.fillStyle = joyGrad;
+          ctx.beginPath();
+          ctx.roundRect(bx + 2, by + 2, Math.max(0, (barW - 4) * (s3.joy / 100)), 11, 99);
+          ctx.fill();
+
+          ctx.fillStyle = '#FFE89E';
+          ctx.font = '700 13px "Noto Serif TC", serif';
+          ctx.textAlign = 'center';
+          ctx.fillText(
+            s3.joy >= 100
+              ? '👑 女王笑到極限！快點擊下方按鈕發動終極一吼！'
+              : `女王狂喜值：${Math.floor(s3.joy)}%（越積越久越開心・點擊金色鉅額單加倍！）`,
+            W * 0.5,
+            by + 33
+          );
+        }
+      }
+
+      /* --------------------------------------------------------------------------
+       * 10. 終章過關儀式：《拔起神劍・加冕銷單王》
+       * -------------------------------------------------------------------------- */
+      function initFinale() {
+        state.finale = {
+          pullProgress: 0, // 0..100
+          isHolding: false,
+          tickAccum: 0,
+          pulled: false,
+          celebrateDelay: 0
+        };
+      }
+
+      function addSwordPull(amount) {
+        const f = state.finale;
+        if (!f || f.pulled || state.pausedForScroll) return;
+        f.pullProgress = clamp(f.pullProgress + amount, 0, 100);
+        state.shake = Math.max(state.shake, 2 + (f.pullProgress / 100) * 6);
+
+        if (Math.random() < 0.5) {
+          spawnParticles(W * 0.5 + rand(-30, 30), H * 0.62 - f.pullProgress * 1.2, 4, {
+            colors: ['#FFE89E', '#D9A74A', '#FFFFFF'],
+            shape: 'star',
+            speedMax: 150,
+            gravity: -40
+          });
+        }
+
+        if (f.pullProgress >= 100 && !f.pulled) {
+          f.pulled = true;
+          f.celebrateDelay = 1.9;
+          audio.sfxSwordUnsheathe();
+          state.shake = 18;
+          state.flashAlpha = 0.85;
+          spawnParticles(W * 0.5, H * 0.45, 110, {
+            colors: ['#FFE89E', '#D9A74A', '#FFFFFF', '#F4ECD8'],
+            speedMin: 80,
+            speedMax: 380,
+            sizeMin: 3,
+            sizeMax: 9,
+            lifeMax: 2.2,
+            gravity: 30,
+            shape: 'star'
+          });
+          spawnFloatingText(W * 0.5, H * 0.22, '✦ 神劍出鞘・銷單王者歸來！ ✦', {
+            size: 30,
+            color: '#FFE89E',
+            stroke: '#121526',
+            life: 2.2,
+            scalePop: true
+          });
+        }
+      }
+
+      function updateFinale(dt) {
+        const f = state.finale;
+        if (!f) return;
+
+        if (f.pulled) {
+          f.celebrateDelay -= dt;
+          if (f.celebrateDelay <= 0 && state.phase === 'FINALE') {
+            openCoronationModal();
+          }
+          return;
+        }
+
+        if (f.isHolding) {
+          addSwordPull(dt * 42);
+          f.tickAccum += dt;
+          if (f.tickAccum >= 0.16) {
+            f.tickAccum = 0;
+            audio.sfxSwordPullTick(f.pullProgress / 100);
+          }
+        } else if (f.pullProgress > 0) {
+          // 輕微回落增加拔劍手感
+          f.pullProgress = Math.max(0, f.pullProgress - dt * 7);
+        }
+
+        hudCenterText.textContent = `神劍拔出進度 ${Math.floor(f.pullProgress)}%`;
+      }
+
+      function drawFinale() {
+        const f = state.finale;
+        const p = f.pullProgress / 100;
+
+        // 神聖金色祭壇背景
+        const bg = ctx.createRadialGradient(W * 0.5, H * 0.48, 20, W * 0.5, H * 0.5, Math.max(W, H) * 0.78);
+        bg.addColorStop(0, `rgba(217, 167, 74, ${0.22 + p * 0.42})`);
+        bg.addColorStop(0.5, '#191d36');
+        bg.addColorStop(1, '#0b0d19');
+        ctx.fillStyle = bg;
+        ctx.fillRect(0, 0, W, H);
+
+        // 隨拔劍進度直衝天際的聖光光柱
+        const beamW = 50 + p * 180;
+        const beamGrad = ctx.createLinearGradient(W * 0.5 - beamW / 2, 0, W * 0.5 + beamW / 2, 0);
+        beamGrad.addColorStop(0, 'rgba(255, 232, 158, 0)');
+        beamGrad.addColorStop(0.5, `rgba(255, 232, 158, ${0.14 + p * 0.5})`);
+        beamGrad.addColorStop(1, 'rgba(255, 232, 158, 0)');
+        ctx.fillStyle = beamGrad;
+        ctx.fillRect(W * 0.5 - beamW / 2, 0, beamW, H);
+
+        drawArtNouveauHalo(W * 0.5, H * 0.45, Math.min(W, H) * (0.28 + p * 0.12), 0.3 + p * 0.45);
+
+        // 寶劍位置（隨進度緩緩向上出鞘）
+        const liftY = p * (H * 0.24) + (f.pulled ? Math.sin(state.time * 3) * 8 : 0);
+        const trembleX = f.isHolding && !f.pulled ? rand(-2.5, 2.5) : 0;
+        const swordCx = W * 0.5 + trembleX;
+        const swordBaseY = H * 0.72 - liftY;
+        const bladeH = Math.min(H * 0.46, 220);
+
+        ctx.save();
+        ctx.translate(swordCx, swordBaseY);
+
+        // 萬丈金光劍氣
+        ctx.shadowColor = '#FFE89E';
+        ctx.shadowBlur = 18 + p * 36;
+
+        // 劍身
+        const bladeGrad = ctx.createLinearGradient(-22, 0, 22, 0);
+        bladeGrad.addColorStop(0, '#c89230');
+        bladeGrad.addColorStop(0.5, '#FFF8D6');
+        bladeGrad.addColorStop(1, '#c89230');
+        ctx.fillStyle = bladeGrad;
+        ctx.strokeStyle = '#FFE89E';
+        ctx.lineWidth = 2;
+
+        ctx.beginPath();
+        ctx.moveTo(0, -bladeH); // 劍尖朝上（拔起後更威武）或劍尖插於石座？
+        // 讓劍尖朝下插在石座中，劍柄在上，拔起時整把劍從石座升起！
+        ctx.restore();
+
+        // 重新精細繪製「劍尖插於石座、劍柄在上方」的拔劍經典姿態
+        ctx.save();
+        ctx.translate(swordCx, swordBaseY);
+        ctx.shadowColor = '#FFE89E';
+        ctx.shadowBlur = 18 + p * 40;
+
+        // 劍身（往下延伸至劍尖）
+        const bGrad = ctx.createLinearGradient(-22, 0, 22, 0);
+        bGrad.addColorStop(0, '#b98229');
+        bGrad.addColorStop(0.5, '#FFF9DC');
+        bGrad.addColorStop(1, '#b98229');
+        ctx.fillStyle = bGrad;
+        ctx.strokeStyle = '#FFE89E';
+        ctx.lineWidth = 2;
+
+        const bladeTop = -bladeH * 0.88;
+        const bladeTip = bladeH * 0.34;
+        ctx.beginPath();
+        ctx.moveTo(-22, bladeTop);
+        ctx.lineTo(22, bladeTop);
+        ctx.lineTo(18, bladeTip - 32);
+        ctx.lineTo(0, bladeTip);
+        ctx.lineTo(-18, bladeTip - 32);
+        ctx.closePath();
+        ctx.fill();
+        ctx.stroke();
+
+        // 劍身中央清晰鐫刻發光金色書法大字：「銷單王」
+        ctx.shadowColor = '#C83E37';
+        ctx.shadowBlur = 10;
+        ctx.fillStyle = '#8e231e';
+        ctx.font = '900 22px "Noto Serif TC", serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        const textCenterY = (bladeTop + bladeTip - 32) / 2;
+        ctx.fillText('銷', 0, textCenterY - 30);
+        ctx.fillText('單', 0, textCenterY);
+        ctx.fillText('王', 0, textCenterY + 30);
+
+        // 華麗新藝術翼型護手
+        ctx.shadowColor = '#FFE89E';
+        ctx.shadowBlur = 16;
+        ctx.fillStyle = '#D9A74A';
+        ctx.strokeStyle = '#FFF3C4';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(-58, bladeTop - 6);
+        ctx.quadraticCurveTo(0, bladeTop + 14, 58, bladeTop - 6);
+        ctx.quadraticCurveTo(0, bladeTop - 22, -58, bladeTop - 6);
+        ctx.closePath();
+        ctx.fill();
+        ctx.stroke();
+
+        // 劍柄與紅寶石劍首
+        ctx.fillStyle = '#5B2A6B';
+        ctx.fillRect(-7, bladeTop - 54, 14, 48);
+        ctx.strokeRect(-7, bladeTop - 54, 14, 48);
+
+        ctx.fillStyle = '#C83E37';
+        ctx.beginPath();
+        ctx.arc(0, bladeTop - 62, 12, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.restore();
+
+        // 神聖石座（覆蓋劍尖底部，拔出後劍尖完全脫離石座）
+        ctx.save();
+        ctx.translate(W * 0.5, H * 0.8);
+        const stoneGrad = ctx.createLinearGradient(-90, -20, 90, 60);
+        stoneGrad.addColorStop(0, '#363b54');
+        stoneGrad.addColorStop(1, '#181b2e');
+        ctx.fillStyle = stoneGrad;
+        ctx.strokeStyle = '#D9A74A';
+        ctx.lineWidth = 2.4;
+        ctx.beginPath();
+        ctx.moveTo(-95, 55);
+        ctx.lineTo(-72, -18);
+        ctx.lineTo(72, -18);
+        ctx.lineTo(95, 55);
+        ctx.closePath();
+        ctx.fill();
+        ctx.stroke();
+
+        // 石座符文金線
+        ctx.strokeStyle = `rgba(255, 232, 158, ${0.35 + p * 0.65})`;
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(-52, 12);
+        ctx.lineTo(52, 12);
+        ctx.stroke();
+        ctx.restore();
+
+        // 提示字與蓄力弧條
+        if (!f.pulled) {
+          ctx.fillStyle = '#FFE89E';
+          ctx.font = '700 15px "Noto Serif TC", serif';
+          ctx.textAlign = 'center';
+          ctx.fillText(`長按畫面或下方按鈕拔起神劍（${Math.floor(f.pullProgress)}%）`, W * 0.5, 34);
+        }
+      }
+
+      /* --------------------------------------------------------------------------
+       * 11. 流程控制、章節捲軸與加冕紀念畫卡 PNG 匯出
+       * -------------------------------------------------------------------------- */
+      const CHAPTER_INFO = {
+        STAGE1: {
+          seal: '壹',
+          chapter: '第一關',
+          title: '萬單齊發・恐龍刺蝟魔王',
+          desc: '不斷點擊畫面或「消費印單」，創造無數發光單據射向恐龍刺蝟魔王！留意魔王捲縮刺球反彈的時機，集滿消費狂潮即可施放「百單核爆」！',
+          hud: '第一關・萬單伐魔王'
+        },
+        STAGE2: {
+          seal: '貳',
+          chapter: '第二關',
+          title: '送件不送・蝸牛勇闖山林',
+          desc: '背著單據山、堅持「送件不送」的大蝸牛勇闖翡翠山林！點擊畫面或按空白鍵小跳躍，躲開退件荊棘與催件巨石，接住山林靈露抵達送件亭！',
+          hud: '第二關・蝸牛闖山林'
+        },
+        STAGE3: {
+          seal: '參',
+          chapter: '第三關',
+          title: '核銷殿堂・女王的狂喜與清場咆哮',
+          desc: '單據核銷累積越久、堆得越高，核銷女王就笑得越開懷！狂點或長按堆高單據並接住金色鉅額單，狂喜達 100% 後觸發女王終極一吼清空萬單！',
+          hud: '第三關・女王核銷殿堂'
+        },
+        FINALE: {
+          seal: '王',
+          chapter: '終章儀式',
+          title: '拔起神劍・加冕銷單王',
+          desc: '三關皆已制霸！神聖祭壇中佇立著散發萬丈金光、鐫刻「銷單王」的傳說寶劍。長按或連點，親手將神劍拔出石座！',
+          hud: '終章・拔起銷單王神劍'
+        }
+      };
+
+      function syncControlDeck(phase) {
+        ctrlTitle.classList.toggle('hidden', phase !== 'TITLE' && phase !== 'CORONATION');
+        ctrlStage1.classList.toggle('hidden', phase !== 'STAGE1');
+        ctrlStage2.classList.toggle('hidden', phase !== 'STAGE2');
+        ctrlStage3.classList.toggle('hidden', phase !== 'STAGE3');
+        ctrlFinale.classList.toggle('hidden', phase !== 'FINALE');
+        hudCenterStat.classList.toggle('hidden', phase === 'TITLE' || phase === 'CORONATION');
+      }
+
+      function enterStageWithScroll(targetPhase) {
+        state.phase = targetPhase;
+        state.pausedForScroll = true;
+        state.particles = [];
+        state.floatingTexts = [];
+
+        const info = CHAPTER_INFO[targetPhase];
+        hudStageLabel.textContent = info.hud;
+        scrollSeal.textContent = info.seal;
+        scrollChapter.textContent = info.chapter;
+        scrollTitle.textContent = info.title;
+        scrollDesc.textContent = info.desc;
+
+        if (targetPhase === 'STAGE1') initStage1();
+        if (targetPhase === 'STAGE2') initStage2();
+        if (targetPhase === 'STAGE3') initStage3();
+        if (targetPhase === 'FINALE') initFinale();
+
+        syncControlDeck(targetPhase);
+        audio.setTrack(targetPhase);
+
+        scrollOverlay.classList.remove('hidden');
+      }
+
+      function openCoronationModal() {
+        state.phase = 'CORONATION';
+        hudStageLabel.textContent = '榮耀加冕・銷單王者歸來';
+        syncControlDeck('CORONATION');
+
+        statInvoicesEl.textContent = state.stats.totalInvoices.toLocaleString();
+        statStepsEl.textContent = state.stats.snailSteps.toLocaleString();
+        statDecibelsEl.textContent = state.stats.queenDecibels.toFixed(1);
+
+        coronationOverlay.classList.remove('hidden');
+      }
+
+      /* 繪製並下載高解析度 1080×1440 鎏金銷單王紀念畫卡 (PNG) */
+      function downloadCommemorativeCard() {
+        try {
+          const cardCanvas = document.createElement('canvas');
+          const cw = 1080;
+          const ch = 1440;
+          cardCanvas.width = cw;
+          cardCanvas.height = ch;
+          const c = cardCanvas.getContext('2d');
+
+          // 深邃皇家午夜藍底色
+          const bg = c.createRadialGradient(cw / 2, ch * 0.42, 60, cw / 2, ch / 2, ch * 0.72);
+          bg.addColorStop(0, '#2a274d');
+          bg.addColorStop(0.55, '#121526');
+          bg.addColorStop(1, '#090b15');
+          c.fillStyle = bg;
+          c.fillRect(0, 0, cw, ch);
+
+          // 雙層新藝術運動鎏金畫框
+          c.strokeStyle = '#D9A74A';
+          c.lineWidth = 8;
+          c.strokeRect(42, 42, cw - 84, ch - 84);
+          c.strokeStyle = '#FFE89E';
+          c.lineWidth = 2.5;
+          c.strokeRect(62, 62, cw - 124, ch - 124);
+
+          // 中央金色光環
+          c.save();
+          c.translate(cw / 2, 540);
+          c.strokeStyle = 'rgba(255, 232, 158, 0.35)';
+          c.lineWidth = 3;
+          c.beginPath();
+          c.arc(0, 0, 260, 0, Math.PI * 2);
+          c.stroke();
+          c.beginPath();
+          c.arc(0, 0, 225, 0, Math.PI * 2);
+          c.stroke();
+
+          // 放射聖光
+          for (let i = 0; i < 32; i++) {
+            const a = (i / 32) * Math.PI * 2;
+            c.beginPath();
+            c.moveTo(Math.cos(a) * 225, Math.sin(a) * 225);
+            c.lineTo(Math.cos(a) * 260, Math.sin(a) * 260);
+            c.stroke();
+          }
+
+          // 神劍主視覺（劍尖朝上，散發金光，刻著「銷單王」）
+          c.shadowColor = '#FFE89E';
+          c.shadowBlur = 35;
+          const bladeGrad = c.createLinearGradient(-34, 0, 34, 0);
+          bladeGrad.addColorStop(0, '#b98229');
+          bladeGrad.addColorStop(0.5, '#FFF8D6');
+          bladeGrad.addColorStop(1, '#b98229');
+          c.fillStyle = bladeGrad;
+          c.beginPath();
+          c.moveTo(0, -245);
+          c.lineTo(34, -175);
+          c.lineTo(30, 125);
+          c.lineTo(-30, 125);
+          c.lineTo(-34, -175);
+          c.closePath();
+          c.fill();
+
+          // 劍身書法「銷單王」
+          c.shadowBlur = 8;
+          c.fillStyle = '#8e231e';
+          c.font = '900 44px "Noto Serif TC", Georgia, serif';
+          c.textAlign = 'center';
+          c.textBaseline = 'middle';
+          c.fillText('銷', 0, -90);
+          c.fillText('單', 0, -25);
+          c.fillText('王', 0, 40);
+
+          // 翼型護手與劍柄
+          c.shadowBlur = 20;
+          c.fillStyle = '#D9A74A';
+          c.beginPath();
+          c.moveTo(-110, 122);
+          c.quadraticCurveTo(0, 165, 110, 122);
+          c.quadraticCurveTo(0, 96, -110, 122);
+          c.closePath();
+          c.fill();
+
+          c.fillStyle = '#5B2A6B';
+          c.fillRect(-14, 130, 28, 86);
+          c.fillStyle = '#C83E37';
+          c.beginPath();
+          c.arc(0, 224, 22, 0, Math.PI * 2);
+          c.fill();
+          c.restore();
+
+          // 標題文字
+          c.fillStyle = '#FFE89E';
+          c.font = '700 28px "Noto Serif TC", Georgia, serif';
+          c.textAlign = 'center';
+          c.fillText('✦  鎏金浮世繪本・榮耀加冕紀念畫卡  ✦', cw / 2, 140);
+
+          c.font = '900 82px "Noto Serif TC", Georgia, serif';
+          c.fillStyle = '#FFE89E';
+          c.fillText('銷單王者歸來', cw / 2, 232);
+
+          // 三關成就戰績卡片
+          const statsY = 930;
+          const items = [
+            { label: '創造單據總數', val: `${state.stats.totalInvoices} 張`, color: '#FFE89E' },
+            { label: '蝸牛山林步數', val: `${state.stats.snailSteps} 步`, color: '#8CE0C3' },
+            { label: '女王笑聲分貝', val: `${state.stats.queenDecibels.toFixed(1)} dB`, color: '#F5B0FF' }
+          ];
+          items.forEach((it, idx) => {
+            const bx = 110 + idx * 295;
+            c.fillStyle = 'rgba(244, 236, 216, 0.08)';
+            c.strokeStyle = '#D9A74A';
+            c.lineWidth = 2.5;
+            c.beginPath();
+            c.roundRect(bx, statsY, 270, 175, 22);
+            c.fill();
+            c.stroke();
+
+            c.fillStyle = '#F4ECD8';
+            c.font = '700 24px "Noto Serif TC", serif';
+            c.fillText(it.label, bx + 135, statsY + 55);
+
+            c.fillStyle = it.color;
+            c.font = '900 44px "Noto Serif TC", serif';
+            c.fillText(it.val, bx + 135, statsY + 122);
+          });
+
+          // 底部硃砂認證印章與日期
+          c.fillStyle = '#C83E37';
+          c.beginPath();
+          c.roundRect(cw / 2 - 110, 1165, 220, 74, 14);
+          c.fill();
+          c.strokeStyle = '#FFE89E';
+          c.lineWidth = 3;
+          c.stroke();
+
+          c.fillStyle = '#F4ECD8';
+          c.font = '900 32px "Noto Serif TC", serif';
+          c.fillText('認證・銷單王', cw / 2, 1212);
+
+          const today = new Date();
+          const dateStr = `${today.getFullYear()} . ${String(today.getMonth() + 1).padStart(2, '0')} . ${String(today.getDate()).padStart(2, '0')}`;
+          c.fillStyle = 'rgba(244, 236, 216, 0.72)';
+          c.font = '500 24px "Cinzel", Georgia, serif';
+          c.fillText(`RETURN OF THE INVOICE KING  |  ${dateStr}`, cw / 2, 1320);
+
+          const link = document.createElement('a');
+          link.download = `銷單王者歸來_紀念畫卡_${Date.now()}.png`;
+          link.href = cardCanvas.toDataURL('image/png');
+          link.click();
+          showToast('✦ 已下載「鎏金銷單王紀念畫卡」！');
+        } catch (err) {
+          showToast('畫卡產生時發生小狀況，請再試一次');
+        }
+      }
+
+      /* --------------------------------------------------------------------------
+       * 12. 互動事件綁定（滑鼠、觸控與鍵盤）
+       * -------------------------------------------------------------------------- */
+      document.getElementById('startGameBtn').addEventListener('click', () => {
+        audio.init();
+        titleOverlay.classList.add('opacity-0', 'pointer-events-none');
+        setTimeout(() => titleOverlay.classList.add('hidden'), 450);
+        state.stats = { totalInvoices: 0, snailSteps: 0, queenDecibels: 65.0 };
+        enterStageWithScroll('STAGE1');
+      });
+
+      scrollContinueBtn.addEventListener('click', () => {
+        audio.init();
+        scrollOverlay.classList.add('hidden');
+        state.pausedForScroll = false;
+      });
+
+      musicToggleBtn.addEventListener('click', () => audio.toggle());
+
+      document.getElementById('downloadCardBtn').addEventListener('click', downloadCommemorativeCard);
+
+      document.getElementById('replayGameBtn').addEventListener('click', () => {
+        coronationOverlay.classList.add('hidden');
+        state.stats = { totalInvoices: 0, snailSteps: 0, queenDecibels: 65.0 };
+        enterStageWithScroll('STAGE1');
+      });
+
+      // 第一關按鈕
+      btnPrintInvoice.addEventListener('click', () => {
+        audio.init();
+        fireInvoiceStage1();
+      });
+      btnHundredBurst.addEventListener('click', () => {
+        audio.init();
+        triggerHundredBurst();
+      });
+
+      // 第二關按鈕
+      btnSnailJump.addEventListener('click', () => {
+        audio.init();
+        snailJump();
+      });
+      btnSnailSteady.addEventListener('click', () => {
+        audio.init();
+        snailSteadyBoost();
+      });
+
+      // 第三關按鈕（支援點擊與長按）
+      function startHoldPile() {
+        audio.init();
+        if (state.stage3) {
+          state.stage3.isHoldingPile = true;
+          addInvoiceToPalace();
+        }
+      }
+      function endHoldPile() {
+        if (state.stage3) state.stage3.isHoldingPile = false;
+      }
+      btnPileInvoice.addEventListener('pointerdown', startHoldPile);
+      btnPileInvoice.addEventListener('pointerup', endHoldPile);
+      btnPileInvoice.addEventListener('pointerleave', endHoldPile);
+      btnPileInvoice.addEventListener('pointercancel', endHoldPile);
+
+      btnQueenRoar.addEventListener('click', () => {
+        audio.init();
+        triggerQueenRoar();
+      });
+
+      // 終章拔劍按鈕（支援長按與連點）
+      function startHoldSword() {
+        audio.init();
+        if (state.finale) {
+          state.finale.isHolding = true;
+          addSwordPull(8.5);
+          audio.sfxSwordPullTick(state.finale.pullProgress / 100);
+        }
+      }
+      function endHoldSword() {
+        if (state.finale) state.finale.isHolding = false;
+      }
+      btnPullSword.addEventListener('pointerdown', startHoldSword);
+      btnPullSword.addEventListener('pointerup', endHoldSword);
+      btnPullSword.addEventListener('pointerleave', endHoldSword);
+      btnPullSword.addEventListener('pointercancel', endHoldSword);
+
+      // 畫布直接互動（滑鼠點擊 / 手機觸控）
+      canvas.addEventListener('pointerdown', (e) => {
+        audio.init();
+        if (state.pausedForScroll) return;
+        const rect = canvas.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+
+        if (state.phase === 'STAGE1') {
+          fireInvoiceStage1(x, y);
+        } else if (state.phase === 'STAGE2') {
+          snailJump();
+        } else if (state.phase === 'STAGE3' && state.stage3 && !state.stage3.roarTriggered) {
+          // 優先判斷是否點中空中飄落的金色鉅額單據
+          let caughtGolden = false;
+          for (let i = state.stage3.fallingGolden.length - 1; i >= 0; i--) {
+            const g = state.stage3.fallingGolden[i];
+            if (Math.hypot(x - g.x, y - g.y) < 48) {
+              state.stage3.fallingGolden.splice(i, 1);
+              addInvoiceToPalace(g.x, true);
+              spawnFloatingText(g.x, g.y - 20, '✨ 接住鉅額單！女王大樂！', { size: 20, color: '#FFE89E', scalePop: true });
+              caughtGolden = true;
+              break;
+            }
+          }
+          if (!caughtGolden) {
+            state.stage3.isHoldingPile = true;
+            addInvoiceToPalace(x, false);
+          }
+        } else if (state.phase === 'FINALE') {
+          startHoldSword();
+        }
+      });
+
+      window.addEventListener('pointerup', () => {
+        endHoldPile();
+        endHoldSword();
+      });
+
+      // 鍵盤支援（空白鍵）
+      window.addEventListener('keydown', (e) => {
+        if (e.code === 'Space') {
+          e.preventDefault();
+          audio.init();
+          if (state.pausedForScroll) {
+            scrollContinueBtn.click();
+            return;
+          }
+          if (state.phase === 'STAGE1') fireInvoiceStage1();
+          else if (state.phase === 'STAGE2') snailJump();
+          else if (state.phase === 'STAGE3') addInvoiceToPalace();
+          else if (state.phase === 'FINALE') startHoldSword();
+        }
+      });
+
+      window.addEventListener('keyup', (e) => {
+        if (e.code === 'Space') {
+          endHoldSword();
+        }
+      });
+
+      /* --------------------------------------------------------------------------
+       * 13. 主動畫迴圈（於 window.onload 後啟動）
+       * -------------------------------------------------------------------------- */
+      let lastTs = 0;
+
+      function gameLoop(ts) {
+        if (!lastTs) lastTs = ts;
+        const dt = Math.min(0.05, (ts - lastTs) / 1000);
+        lastTs = ts;
+        state.time += dt;
+
+        // 震動與閃光衰減
+        if (state.shake > 0) state.shake = Math.max(0, state.shake - dt * 28);
+        if (state.flashAlpha > 0) state.flashAlpha = Math.max(0, state.flashAlpha - dt * 1.8);
+
+        ctx.save();
+        if (state.shake > 0.2) {
+          ctx.translate(rand(-state.shake, state.shake), rand(-state.shake, state.shake));
+        }
+
+        if (state.phase === 'TITLE') {
+          updateAndDrawTitle(dt);
+        } else if (state.phase === 'STAGE1') {
+          if (!state.pausedForScroll) updateStage1(dt);
+          drawStage1();
+        } else if (state.phase === 'STAGE2') {
+          if (!state.pausedForScroll) updateStage2(dt);
+          drawStage2();
+        } else if (state.phase === 'STAGE3') {
+          if (!state.pausedForScroll) updateStage3(dt);
+          drawStage3();
+        } else if (state.phase === 'FINALE' || state.phase === 'CORONATION') {
+          if (!state.pausedForScroll) updateFinale(dt);
+          drawFinale();
+        }
+
+        updateParticlesAndTexts(dt);
+        drawParticlesAndTexts();
+
+        // 爆發聖光閃白
+        if (state.flashAlpha > 0) {
+          ctx.fillStyle = `rgba(255, 245, 210, ${state.flashAlpha})`;
+          ctx.fillRect(-30, -30, W + 60, H + 60);
+        }
+
+        ctx.restore();
+        requestAnimationFrame(gameLoop);
+      }
+
+      window.addEventListener('resize', resizeCanvas);
+
+      window.onload = function () {
+        resizeCanvas();
+        initTitleScene();
+        syncControlDeck('TITLE');
+        requestAnimationFrame(gameLoop);
+      };
+    })();
+  </script>
+</body>
+</html>
